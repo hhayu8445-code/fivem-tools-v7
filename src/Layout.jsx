@@ -120,7 +120,7 @@ const SidebarContent = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-1">
-                <img src="https://img.icons8.com/3d-fluency/94/box.png" className="w-3 h-3" alt="Assets" />
+                <img src="https://cdn3d.iconscout.com/3d/premium/thumb/add-folder-3d-icon-png-download-5727515.png" className="w-3 h-3" alt="Assets" />
                 <span className="text-[10px] font-medium text-fuchsia-400 uppercase tracking-wider">Assets</span>
               </div>
               <div className="text-xl font-bold text-white">{totalAssets}</div>
@@ -519,34 +519,34 @@ export default function Layout({ children }) {
                         return user.id === '1197320834889560127';
                       }
                     })() && (
-                      <>
-                        <DropdownMenuSeparator className="bg-zinc-800" />
-                        <DropdownMenuItem asChild className="focus:bg-amber-900/20 focus:text-amber-400 cursor-pointer py-2.5">
-                          <Link to="/admin" className="flex items-center gap-3 w-full">
-                            <img src="https://img.icons8.com/3d-fluency/94/crown.png" className="w-5 h-5" alt="Admin" />
-                            <span className="font-medium">Admin Panel</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="focus:bg-violet-900/20 focus:text-violet-400 cursor-pointer py-2.5">
-                          <Link to="/admin/vouches" className="flex items-center gap-3 w-full">
-                            <img src="https://img.icons8.com/3d-fluency/94/verified-badge.png" className="w-5 h-5" alt="Vouches" />
-                            <span className="font-medium">Vouch Management</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="focus:bg-blue-900/20 focus:text-blue-400 cursor-pointer py-2.5">
-                          <Link to="/admin/assets" className="flex items-center gap-3 w-full">
-                            <img src="https://img.icons8.com/3d-fluency/94/box.png" className="w-5 h-5" alt="Assets" />
-                            <span className="font-medium">Asset Management</span>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="focus:bg-blue-900/20 focus:text-blue-400 cursor-pointer py-2.5">
-                          <Link to="/mod" className="flex items-center gap-3 w-full">
-                            <img src="https://img.icons8.com/3d-fluency/94/law.png" className="w-5 h-5" alt="Mod" />
-                            <span className="font-medium">Mod Panel</span>
-                          </Link>
-                        </DropdownMenuItem>
-                      </>
-                    )}
+                        <>
+                          <DropdownMenuSeparator className="bg-zinc-800" />
+                          <DropdownMenuItem asChild className="focus:bg-amber-900/20 focus:text-amber-400 cursor-pointer py-2.5">
+                            <Link to="/admin" className="flex items-center gap-3 w-full">
+                              <img src="https://img.icons8.com/3d-fluency/94/crown.png" className="w-5 h-5" alt="Admin" />
+                              <span className="font-medium">Admin Panel</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="focus:bg-violet-900/20 focus:text-violet-400 cursor-pointer py-2.5">
+                            <Link to="/admin/vouches" className="flex items-center gap-3 w-full">
+                              <img src="https://cdn3d.iconscout.com/3d/premium/thumb/discount-vouchers-3d-icon-png-download-4688367.png" className="w-5 h-5" alt="Vouches" />
+                              <span className="font-medium">Vouch Management</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="focus:bg-blue-900/20 focus:text-blue-400 cursor-pointer py-2.5">
+                            <Link to="/admin/assets" className="flex items-center gap-3 w-full">
+                              <img src="https://cdn3d.iconscout.com/3d/premium/thumb/add-folder-3d-icon-png-download-5727515.png" className="w-5 h-5" alt="Assets" />
+                              <span className="font-medium">Asset Management</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="focus:bg-blue-900/20 focus:text-blue-400 cursor-pointer py-2.5">
+                            <Link to="/mod" className="flex items-center gap-3 w-full">
+                              <img src="https://img.icons8.com/3d-fluency/94/law.png" className="w-5 h-5" alt="Mod" />
+                              <span className="font-medium">Mod Panel</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        </>
+                      )}
 
                     <DropdownMenuSeparator className="bg-zinc-800" />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-400 focus:text-red-300 focus:bg-red-900/20 cursor-pointer py-2.5">

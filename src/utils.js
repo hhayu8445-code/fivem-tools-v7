@@ -35,7 +35,7 @@ export const ICONS = {
   star: 'https://img.icons8.com/3d-fluency/94/star.png',
   crown: 'https://img.icons8.com/3d-fluency/94/crown.png',
   shield: 'https://img.icons8.com/3d-fluency/94/shield.png',
-  box: 'https://img.icons8.com/3d-fluency/94/box.png',
+  box: 'https://cdn3d.iconscout.com/3d/premium/thumb/add-folder-3d-icon-png-download-5727515.png',
   forward: 'https://img.icons8.com/3d-fluency/94/forward.png',
   plus: 'https://img.icons8.com/3d-fluency/94/plus.png',
 };

@@ -18,6 +18,21 @@ export default function AssetManagement() {
   const [filterType, setFilterType] = useState('all');
   const [editingAsset, setEditingAsset] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newAsset, setNewAsset] = useState({
+    name: '',
+    description: '',
+    category: 'script',
+    type: 'free',
+    framework: 'ESX',
+    download_url: '',
+    image_url: '',
+    version: '1.0',
+    file_size: ''
+  });
+  const [uploadMethod, setUploadMethod] = useState('link'); // 'link' or 'file'
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -71,6 +86,28 @@ export default function AssetManagement() {
     onError: () => toast.error('Failed to delete asset')
   });
 
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.Asset.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['assets-admin']);
+      toast.success('Asset created successfully');
+      setIsCreateDialogOpen(false);
+      setNewAsset({
+        name: '',
+        description: '',
+        category: 'script',
+        type: 'free',
+        framework: 'ESX',
+        download_url: '',
+        image_url: '',
+        version: '1.0',
+        file_size: ''
+      });
+      setSelectedFile(null);
+    },
+    onError: () => toast.error('Failed to create asset')
+  });
+
   const handleEdit = (asset) => {
     setEditingAsset({ ...asset });
     setIsDialogOpen(true);
@@ -104,6 +141,62 @@ export default function AssetManagement() {
     updateMutation.mutate({
       id: asset.id,
       data: { type: asset.type === 'premium' ? 'free' : 'premium' }
+    });
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 100 * 1024 * 1024) { // 100MB limit
+        toast.error('File too large. Maximum 100MB');
+        return;
+      }
+      setSelectedFile(file);
+      setNewAsset({ ...newAsset, file_size: `${(file.size / (1024 * 1024)).toFixed(2)} MB` });
+    }
+  };
+
+  const uploadFileToStorage = async (file) => {
+    // Simulate upload to storage (replace with actual upload logic)
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // In production, upload to your storage service (S3, Cloudinary, etc.)
+        const fakeUrl = `https://storage.fivemtools.net/assets/${Date.now()}_${file.name}`;
+        resolve(fakeUrl);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleCreateAsset = async () => {
+    if (!newAsset.name || !newAsset.description) {
+      toast.error('Name and description are required');
+      return;
+    }
+
+    let downloadUrl = newAsset.download_url;
+
+    if (uploadMethod === 'file' && selectedFile) {
+      toast.info('Uploading file...');
+      try {
+        downloadUrl = await uploadFileToStorage(selectedFile);
+      } catch (error) {
+        toast.error('File upload failed');
+        return;
+      }
+    }
+
+    if (!downloadUrl) {
+      toast.error('Download URL or file is required');
+      return;
+    }
+
+    createMutation.mutate({
+      ...newAsset,
+      download_url: downloadUrl,
+      downloads: 0,
+      created_date: new Date().toISOString()
     });
   };
 
@@ -164,6 +257,168 @@ export default function AssetManagement() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Create Button */}
+      <div className="mb-6">
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-fuchsia-600 hover:bg-fuchsia-700">
+              <img src="https://img.icons8.com/3d-fluency/94/plus.png" className="w-5 h-5 mr-2" alt="" />
+              Create New Asset
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100 max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-white flex items-center gap-2">
+                <img src="https://img.icons8.com/3d-fluency/94/box.png" className="w-6 h-6" alt="" />
+                Create New Asset
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Name *</label>
+                <Input
+                  value={newAsset.name}
+                  onChange={(e) => setNewAsset({ ...newAsset, name: e.target.value })}
+                  placeholder="Asset name"
+                  className="bg-zinc-950 border-zinc-700 text-zinc-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Description *</label>
+                <Textarea
+                  value={newAsset.description}
+                  onChange={(e) => setNewAsset({ ...newAsset, description: e.target.value })}
+                  placeholder="Describe your asset"
+                  className="bg-zinc-950 border-zinc-700 text-zinc-300 min-h-[100px]"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Category</label>
+                  <Select value={newAsset.category} onValueChange={(v) => setNewAsset({ ...newAsset, category: v })}>
+                    <SelectTrigger className="bg-zinc-950 border-zinc-700 text-zinc-300">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-900 border-zinc-800">
+                      <SelectItem value="script">Script</SelectItem>
+                      <SelectItem value="mlo">MLO</SelectItem>
+                      <SelectItem value="vehicle">Vehicle</SelectItem>
+                      <SelectItem value="clothing">Clothing</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Type</label>
+                  <Select value={newAsset.type} onValueChange={(v) => setNewAsset({ ...newAsset, type: v })}>
+                    <SelectTrigger className="bg-zinc-950 border-zinc-700 text-zinc-300">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-900 border-zinc-800">
+                      <SelectItem value="free">Free</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Framework</label>
+                  <Select value={newAsset.framework} onValueChange={(v) => setNewAsset({ ...newAsset, framework: v })}>
+                    <SelectTrigger className="bg-zinc-950 border-zinc-700 text-zinc-300">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-900 border-zinc-800">
+                      <SelectItem value="ESX">ESX</SelectItem>
+                      <SelectItem value="QBCore">QBCore</SelectItem>
+                      <SelectItem value="Standalone">Standalone</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Version</label>
+                  <Input
+                    value={newAsset.version}
+                    onChange={(e) => setNewAsset({ ...newAsset, version: e.target.value })}
+                    placeholder="1.0"
+                    className="bg-zinc-950 border-zinc-700 text-zinc-300"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Upload Method</label>
+                <div className="flex gap-2 mb-3">
+                  <Button
+                    type="button"
+                    variant={uploadMethod === 'link' ? 'default' : 'outline'}
+                    onClick={() => setUploadMethod('link')}
+                    className={uploadMethod === 'link' ? 'bg-fuchsia-600' : 'border-zinc-700'}
+                  >
+                    <img src="https://img.icons8.com/3d-fluency/94/link.png" className="w-4 h-4 mr-2" alt="" />
+                    Link URL
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={uploadMethod === 'file' ? 'default' : 'outline'}
+                    onClick={() => setUploadMethod('file')}
+                    className={uploadMethod === 'file' ? 'bg-fuchsia-600' : 'border-zinc-700'}
+                  >
+                    <img src="https://img.icons8.com/3d-fluency/94/upload.png" className="w-4 h-4 mr-2" alt="" />
+                    Upload File
+                  </Button>
+                </div>
+                {uploadMethod === 'link' ? (
+                  <Input
+                    value={newAsset.download_url}
+                    onChange={(e) => setNewAsset({ ...newAsset, download_url: e.target.value })}
+                    placeholder="https://example.com/file.zip"
+                    className="bg-zinc-950 border-zinc-700 text-zinc-300"
+                  />
+                ) : (
+                  <div>
+                    <input
+                      type="file"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      id="file-upload"
+                      accept=".zip,.rar,.7z"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-fuchsia-500 transition-colors"
+                    >
+                      <img src="https://img.icons8.com/3d-fluency/94/upload-to-cloud.png" className="w-8 h-8" alt="" />
+                      <div className="text-center">
+                        <p className="text-zinc-300">
+                          {selectedFile ? selectedFile.name : 'Click to upload file'}
+                        </p>
+                        <p className="text-xs text-zinc-500 mt-1">ZIP, RAR, 7Z (Max 100MB)</p>
+                      </div>
+                    </label>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Image URL</label>
+                <Input
+                  value={newAsset.image_url}
+                  onChange={(e) => setNewAsset({ ...newAsset, image_url: e.target.value })}
+                  placeholder="https://example.com/image.jpg"
+                  className="bg-zinc-950 border-zinc-700 text-zinc-300"
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button onClick={handleCreateAsset} disabled={createMutation.isPending} className="flex-1 bg-fuchsia-600 hover:bg-fuchsia-700">
+                  {createMutation.isPending ? 'Creating...' : 'Create Asset'}
+                </Button>
+                <Button onClick={() => setIsCreateDialogOpen(false)} variant="outline" className="border-zinc-700 text-zinc-300">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Filters */}
@@ -238,7 +493,17 @@ export default function AssetManagement() {
                         <div className="flex gap-2">
                           <Badge variant={asset.type === 'premium' ? 'default' : 'secondary'} 
                                  className={asset.type === 'premium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}>
-                            {asset.type === 'premium' ? '👑 Premium' : '🆓 Free'}
+                            {asset.type === 'premium' ? (
+                              <span className="flex items-center gap-1">
+                                <img src="https://img.icons8.com/3d-fluency/94/crown.png" className="w-4 h-4" alt="" />
+                                Premium
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1">
+                                <img src="https://img.icons8.com/3d-fluency/94/checkmark.png" className="w-4 h-4" alt="" />
+                                Free
+                              </span>
+                            )}
                           </Badge>
                           <Badge variant="outline" className="border-zinc-700 text-zinc-400">
                             {asset.category}

@@ -51,6 +51,8 @@ export function CategoryChart({ data }) {
 }
 
 export function StatsCard({ title, value, icon, trend }) {
+  const isIconUrl = typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('/'));
+  
   return (
     <Card className="bg-zinc-900 border-zinc-800">
       <CardContent className="p-6">
@@ -59,12 +61,23 @@ export function StatsCard({ title, value, icon, trend }) {
             <p className="text-sm text-zinc-400">{title}</p>
             <p className="text-3xl font-bold text-white mt-2">{value}</p>
             {trend && (
-              <p className={`text-sm mt-2 ${trend > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}% from last week
+              <p className={`text-sm mt-2 flex items-center gap-1 ${trend > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                <img 
+                  src={trend > 0 ? 'https://img.icons8.com/3d-fluency/94/arrow-up.png' : 'https://img.icons8.com/3d-fluency/94/arrow-down.png'} 
+                  className="w-4 h-4" 
+                  alt="" 
+                />
+                {Math.abs(trend)}% from last week
               </p>
             )}
           </div>
-          <div className="text-4xl">{icon}</div>
+          <div>
+            {isIconUrl ? (
+              <img src={icon} className="w-12 h-12" alt="" />
+            ) : (
+              <div className="text-4xl">{icon}</div>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

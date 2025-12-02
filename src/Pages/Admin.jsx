@@ -129,10 +129,10 @@ export default function Admin() {
 
       {/* Analytics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Total Assets" value={analytics?.totalAssets || 0} icon="📦" trend={5} />
-        <StatsCard title="Total Downloads" value={analytics?.totalDownloads || 0} icon="⬇️" trend={12} />
-        <StatsCard title="Total Users" value={analytics?.totalUsers || 0} icon="👥" trend={8} />
-        <StatsCard title="VIP Members" value={analytics?.vipUsers || 0} icon="👑" trend={3} />
+        <StatsCard title="Total Assets" value={analytics?.totalAssets || 0} icon="https://img.icons8.com/3d-fluency/94/box.png" trend={5} />
+        <StatsCard title="Total Downloads" value={analytics?.totalDownloads || 0} icon="https://img.icons8.com/3d-fluency/94/download-from-cloud.png" trend={12} />
+        <StatsCard title="Total Users" value={analytics?.totalUsers || 0} icon="https://img.icons8.com/3d-fluency/94/conference-call.png" trend={8} />
+        <StatsCard title="VIP Members" value={analytics?.vipUsers || 0} icon="https://img.icons8.com/3d-fluency/94/crown.png" trend={3} />
       </div>
 
       {/* Charts */}
