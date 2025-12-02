@@ -1,16 +1,19 @@
-// WARNING: In production, move these to environment variables
-// Use import.meta.env.VITE_API_KEY and import.meta.env.VITE_APP_ID
+// ✅ SECURITY FIX: Validate environment variables at startup
 const API_KEY = import.meta.env.VITE_API_KEY;
 const APP_ID = import.meta.env.VITE_APP_ID;
 
+// 🔴 THROW ERROR if credentials are missing - don't silently continue
 if (!API_KEY || !APP_ID) {
-  console.error('Missing required environment variables: VITE_API_KEY or VITE_APP_ID');
+  const missingVars = [];
+  if (!API_KEY) missingVars.push('VITE_API_KEY');
+  if (!APP_ID) missingVars.push('VITE_APP_ID');
+  throw new Error(
+    `❌ CRITICAL: Missing environment variables: ${missingVars.join(', ')}\n` +
+    'Please check your .env file and ensure all required variables are set.'
+  );
 }
-const BASE_URL = `https://app.base44.com/api/apps/${APP_ID}/entities`;
 
-if (!import.meta.env.VITE_API_KEY) {
-  console.warn('⚠️ API credentials exposed! Set VITE_API_KEY in .env file');
-}
+const BASE_URL = `https://app.base44.com/api/apps/${APP_ID}/entities`;
 
 // Helper to construct query string from object
 const buildQueryString = (params) => {
@@ -64,14 +67,16 @@ const apiRequest = async (entityName, method = 'GET', id = '', data = null, para
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
-            throw new Error(`API Error ${response.status}: ${response.statusText}`);
+            const errorData = await response.text().catch(() => '');
+            const errorMessage = `API Error ${response.status}: ${response.statusText}`;
+            throw new Error(errorMessage);
         }
         return await response.json();
     } catch (error) {
-        console.error(`Failed to ${method} ${entityName}:`, error);
-        // Fallback to empty array or null to prevent app crash
-        if (method === 'GET' && !id) return [];
-        return null;
+        console.error(`❌ Failed to ${method} ${entityName}:`, error);
+        // ✅ IMPROVED: Throw error instead of silently failing
+        // Components can catch and show toast notifications
+        throw error;
     }
 };
 
@@ -136,17 +141,26 @@ export const base44 = {
       const savedState = localStorage.getItem('oauth_state');
       if (state !== savedState) throw new Error('Invalid state');
       
-      const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+      // 🔴 CRITICAL SECURITY: Client secret should NEVER be in frontend code!
+      // This must be handled by a backend endpoint to keep the secret secure.
+      // Frontend should send code to backend, backend exchanges for token.
+      // TODO: Implement secure backend OAuth callback handler
+      // Example endpoint: POST /api/auth/callback?code=xxx&state=yyy
+      const backendResponse = await fetch('/api/auth/discord/callback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: DISCORD_CLIENT_ID,
-          client_secret: import.meta.env.VITE_DISCORD_CLIENT_SECRET,
-          grant_type: 'authorization_code',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           code: code,
+          state: state,
           redirect_uri: DISCORD_REDIRECT_URI
         })
       });
+      
+      if (!backendResponse.ok) {
+        throw new Error('Backend OAuth callback failed');
+      }
+      
+      const tokenResponse = backendResponse;
       
       const tokens = await tokenResponse.json();
       if (!tokens.access_token) throw new Error('Failed to get token');

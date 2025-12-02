@@ -1,5 +1,6 @@
 import { clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { preventXSS } from "@/utils/security"
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs))
@@ -7,15 +8,22 @@ export function cn(...inputs) {
 
 export function getAchievements(profile) {
   if (!profile) return [];
+  // ✅ FIX: Sanitize profile data to prevent XSS attacks
+  const sanitizedProfile = {
+    ...profile,
+    username: profile.username ? preventXSS(profile.username) : '',
+    bio: profile.bio ? preventXSS(profile.bio) : '',
+  };
+  
   const list = [];
 
-  if (profile.posts_count >= 1) list.push({ name: 'First Words', desc: 'Made your first post', icon: 'https://cdn3d.iconscout.com/3d/premium/thumb/message-3d-icon-png-download-5576258.png', color: 'text-blue-400 bg-blue-500/10' });
-  if (profile.posts_count >= 50) list.push({ name: 'Contributor', desc: 'Posted 50 times', icon: 'https://img.icons8.com/3d-fluency/94/edit.png', color: 'text-fuchsia-400 bg-fuchsia-500/10' });
-  if (profile.likes_received_count >= 10) list.push({ name: 'Appreciated', desc: 'Received 10 likes', icon: 'https://img.icons8.com/3d-fluency/94/like.png', color: 'text-red-400 bg-red-500/10' });
-  if (profile.reputation >= 50) list.push({ name: 'Respected', desc: '50+ Reputation Score', icon: 'https://img.icons8.com/3d-fluency/94/star.png', color: 'text-purple-400 bg-purple-500/10' });
-  if (profile.reputation >= 200) list.push({ name: 'Community Pillar', desc: '200+ Reputation Score', icon: 'https://img.icons8.com/3d-fluency/94/shield.png', color: 'text-indigo-400 bg-indigo-500/10' });
-  if (profile.points >= 100) list.push({ name: 'Point Collector', desc: 'Earned 100 points', icon: 'https://img.icons8.com/3d-fluency/94/lightning-bolt.png', color: 'text-amber-400 bg-amber-500/10' });
-  if (profile.membership_tier === 'vip') list.push({ name: 'VIP Member', desc: 'Supported the community', icon: 'https://img.icons8.com/3d-fluency/94/crown.png', color: 'text-yellow-400 bg-yellow-500/10' });
+  if (sanitizedProfile.posts_count >= 1) list.push({ name: 'First Words', desc: 'Made your first post', icon: 'https://cdn3d.iconscout.com/3d/premium/thumb/message-3d-icon-png-download-5576258.png', color: 'text-blue-400 bg-blue-500/10' });
+  if (sanitizedProfile.posts_count >= 50) list.push({ name: 'Contributor', desc: 'Posted 50 times', icon: 'https://img.icons8.com/3d-fluency/94/edit.png', color: 'text-fuchsia-400 bg-fuchsia-500/10' });
+  if (sanitizedProfile.likes_received_count >= 10) list.push({ name: 'Appreciated', desc: 'Received 10 likes', icon: 'https://img.icons8.com/3d-fluency/94/like.png', color: 'text-red-400 bg-red-500/10' });
+  if (sanitizedProfile.reputation >= 50) list.push({ name: 'Respected', desc: '50+ Reputation Score', icon: 'https://img.icons8.com/3d-fluency/94/star.png', color: 'text-purple-400 bg-purple-500/10' });
+  if (sanitizedProfile.reputation >= 200) list.push({ name: 'Community Pillar', desc: '200+ Reputation Score', icon: 'https://img.icons8.com/3d-fluency/94/shield.png', color: 'text-indigo-400 bg-indigo-500/10' });
+  if (sanitizedProfile.points >= 100) list.push({ name: 'Point Collector', desc: 'Earned 100 points', icon: 'https://img.icons8.com/3d-fluency/94/lightning-bolt.png', color: 'text-amber-400 bg-amber-500/10' });
+  if (sanitizedProfile.membership_tier === 'vip') list.push({ name: 'VIP Member', desc: 'Supported the community', icon: 'https://img.icons8.com/3d-fluency/94/crown.png', color: 'text-yellow-400 bg-yellow-500/10' });
 
   list.push({ name: 'Newcomer', desc: 'Joined the community', icon: 'https://img.icons8.com/3d-fluency/94/user-male-circle.png', color: 'text-emerald-400 bg-emerald-500/10' });
 

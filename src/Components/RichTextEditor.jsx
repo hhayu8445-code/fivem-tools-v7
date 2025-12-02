@@ -19,7 +19,8 @@ export default function RichTextEditor({ value, onChange, height = '300px', plac
         theme="snow"
         value={value}
         onChange={onChange}
-        className={`h-[${height}] mb-12`}
+        style={{ height }}
+        className="mb-12"
         placeholder={placeholder}
         modules={EDITOR_MODULES}
       />

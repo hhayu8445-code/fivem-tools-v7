@@ -1,5 +1,6 @@
 import React from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -78,18 +79,14 @@ function SettingsForm({ profile, queryClient }) {
 }
 
 export default function Dashboard() {
+  // ✅ FIX: Use useAuth hook instead of duplicate useState/useEffect
+  const { user, loading } = useAuth();
   const queryClient = useQueryClient();
-  const [user, setUser] = React.useState(null);
-  const [showLoginModal, setShowLoginModal] = React.useState(false);
+  const [showLoginModal, setShowLoginModal] = React.useState(!user && !loading);
 
   React.useEffect(() => {
-    const load = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
-        setShowLoginModal(true);
-        return;
-      }
-      const u = await base44.auth.me();
+    if (loading) return;
+    setShowLoginModal(!user);
       setUser(u);
     };
     load();

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/hooks/useAuth';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -15,18 +16,14 @@ import { DownloadChart, CategoryChart, StatsCard } from '@/Components/AnalyticsC
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 
 export default function Admin() {
-  const [user, setUser] = React.useState(null);
-  const [showLoginModal, setShowLoginModal] = React.useState(false);
+  // ✅ FIX: Use useAuth hook instead of duplicate useState/useEffect
+  const { user, loading: authLoading } = useAuth();
+  const [showLoginModal, setShowLoginModal] = React.useState(!user && !authLoading);
   
   React.useEffect(() => {
-      base44.auth.me().then(u => {
-          if (!u) {
-              setShowLoginModal(true);
-              return;
-          }
-          setUser(u);
-      });
-  }, []);
+    if (authLoading) return;
+    setShowLoginModal(!user);
+  }, [user, authLoading]);
 
   const [formData, setFormData] = useState({
     title: '',
