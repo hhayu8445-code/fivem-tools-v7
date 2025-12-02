@@ -6,18 +6,26 @@ export default function Footer() {
     <footer className="border-t border-zinc-800/50 bg-zinc-950/30 backdrop-blur-sm mt-20">
       {/* Sponsor Banners */}
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-4">
-        <div className="rounded-xl overflow-hidden border border-zinc-800/50">
+        <div className="rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50">
           <img 
-            src="https://cdn.discordapp.com/attachments/1350474784395235469/1425461397210267678/letra_serverlist_gif.gif?ex=692edce0&is=692d8b60&hm=b70aed56c465f2de16ee252675ccaec9b68b3d507def191252678a3a4626c0f8" 
-            alt="Sponsor" 
-            className="w-full h-auto" 
+            src="https://media.discordapp.net/attachments/1350474784395235469/1425461397210267678/letra_serverlist_gif.gif" 
+            alt="Sponsor Banner" 
+            className="w-full h-auto"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.innerHTML = '<div class="p-8 text-center text-zinc-500"><img src="https://img.icons8.com/3d-fluency/94/advertisement-page.png" class="w-16 h-16 mx-auto mb-2" /><p>Advertisement Space</p></div>';
+            }}
           />
         </div>
-        <div className="rounded-xl overflow-hidden border border-zinc-800/50">
+        <div className="rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50">
           <img 
-            src="https://cdn.discordapp.com/attachments/1350474784395235469/1410460678896091237/serverlist_iteration_1.gif?ex=692f009e&is=692daf1e&hm=622dbf042e1353f0ba1cd6b294c102a29a197d3b487e79d70073754872160266" 
-            alt="Sponsor" 
-            className="w-full h-auto" 
+            src="https://media.discordapp.net/attachments/1350474784395235469/1410460678896091237/serverlist_iteration_1.gif" 
+            alt="Sponsor Banner" 
+            className="w-full h-auto"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.innerHTML = '<div class="p-8 text-center text-zinc-500"><img src="https://img.icons8.com/3d-fluency/94/advertisement-page.png" class="w-16 h-16 mx-auto mb-2" /><p>Advertisement Space</p></div>';
+            }}
           />
         </div>
       </div>

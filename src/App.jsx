@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 import Layout from './Layout';
 import OfflineIndicator from './Components/OfflineIndicator';
 import ErrorBoundary from './Components/ErrorBoundary';
+import RealtimeNotifications from './Components/RealtimeNotifications';
 import { useUpdatePresence } from './hooks/useRealtime';
 import { useAuth } from './hooks/useAuth';
 import 'nprogress/nprogress.css';
@@ -53,6 +54,7 @@ function AppContent() {
 
   return (
     <ErrorBoundary>
+      <RealtimeNotifications userEmail={user?.email} />
       <Router>
           <Layout>
             <Routes>

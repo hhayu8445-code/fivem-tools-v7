@@ -72,14 +72,22 @@ export default function AssetCard({ asset }) {
                         {asset.description}
                     </p>
 
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-800/50">
-                        <div className="flex items-center gap-2 text-xs text-zinc-500">
-                            <img src="https://img.icons8.com/3d-fluency/94/download-from-cloud.png" className="w-4 h-4" alt="Downloads" />
-                            <span>{asset.downloads || 0} downloads</span>
+                    <div className="space-y-2">
+                        {asset.uploader_name && (
+                            <div className="flex items-center gap-2 text-xs text-zinc-500">
+                                <img src="https://img.icons8.com/3d-fluency/94/user-male-circle.png" className="w-4 h-4" alt="" />
+                                <span>by <span className="text-zinc-400 font-medium">{asset.uploader_name}</span></span>
+                            </div>
+                        )}
+                        <div className="flex items-center justify-between pt-2 border-t border-zinc-800/50">
+                            <div className="flex items-center gap-2 text-xs text-zinc-500">
+                                <img src="https://img.icons8.com/3d-fluency/94/download-from-cloud.png" className="w-4 h-4" alt="Downloads" />
+                                <span>{asset.downloads || 0} downloads</span>
+                            </div>
+                            <span className="text-xs font-medium text-zinc-400 group-hover:text-white transition-colors">
+                                Details &rarr;
+                            </span>
                         </div>
-                        <span className="text-xs font-medium text-zinc-400 group-hover:text-white transition-colors">
-                            Details &rarr;
-                        </span>
                     </div>
                 </div>
             </div>

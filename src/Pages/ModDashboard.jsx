@@ -138,186 +138,186 @@ export default function ModDashboard() {
 
     return (
         <>
-        <LoginRequiredModal 
-            isOpen={showLoginModal} 
-            onClose={() => setShowLoginModal(false)}
-            message="You must login first to access moderation dashboard"
-        />
-        <div className="max-w-6xl mx-auto py-8 space-y-8 animate-in fade-in duration-700">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-400 flex items-center gap-4">
-                        <img src="https://img.icons8.com/3d-fluency/94/shield.png" className="w-12 h-12" alt="Shield" />
-                        Moderation Dashboard
-                    </h1>
-                    <p className="text-zinc-400 mt-2 text-lg">Manage reports, users, and content with precision.</p>
+            <LoginRequiredModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+                message="You must login first to access moderation dashboard"
+            />
+            <div className="max-w-6xl mx-auto py-8 space-y-8 animate-in fade-in duration-700">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-400 flex items-center gap-4">
+                            <img src="https://img.icons8.com/3d-fluency/94/shield.png" className="w-12 h-12" alt="Shield" />
+                            Moderation Dashboard
+                        </h1>
+                        <p className="text-zinc-400 mt-2 text-lg">Manage reports, users, and content with precision.</p>
+                    </div>
                 </div>
-            </div>
 
-            <Tabs defaultValue="scripts" className="w-full">
-                <TabsList className="bg-zinc-900/50 backdrop-blur border border-zinc-800 p-1 h-14 rounded-xl">
-                    <TabsTrigger value="scripts" className="h-12 rounded-lg data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-zinc-400 transition-all">
-                        Pending Scripts ({pendingThreads?.length || 0})
-                    </TabsTrigger>
-                    <TabsTrigger value="reports" className="h-12 rounded-lg data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-zinc-400 transition-all">
-                        Pending Reports ({reports?.length || 0})
-                    </TabsTrigger>
-                    <TabsTrigger value="users" className="h-12 rounded-lg data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-zinc-400 transition-all">
-                        User Management
-                    </TabsTrigger>
-                </TabsList>
+                <Tabs defaultValue="scripts" className="w-full">
+                    <TabsList className="bg-zinc-900/50 backdrop-blur border border-zinc-800 p-1 h-14 rounded-xl">
+                        <TabsTrigger value="scripts" className="h-12 rounded-lg data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-zinc-400 transition-all">
+                            Pending Scripts ({pendingThreads?.length || 0})
+                        </TabsTrigger>
+                        <TabsTrigger value="reports" className="h-12 rounded-lg data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-zinc-400 transition-all">
+                            Pending Reports ({reports?.length || 0})
+                        </TabsTrigger>
+                        <TabsTrigger value="users" className="h-12 rounded-lg data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-zinc-400 transition-all">
+                            User Management
+                        </TabsTrigger>
+                    </TabsList>
 
-                <TabsContent value="scripts" className="mt-8">
-                    <div className="grid gap-6">
-                        {pendingThreads?.map(thread => (
-                            <Card key={thread.id} className="bg-zinc-900/50 border-zinc-800 overflow-hidden backdrop-blur-sm hover:border-fuchsia-500/30 transition-all duration-300 group">
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between gap-6">
-                                        <div className="space-y-4 flex-1">
-                                            <div className="flex items-center gap-3">
-                                                <Badge variant="outline" className="border-fuchsia-900 text-fuchsia-400 bg-fuchsia-900/10 px-3 py-1">
-                                                    {thread.is_resource ? 'Script/Resource' : 'Thread'}
-                                                </Badge>
-                                                {thread.tags && thread.tags.length > 0 && (
-                                                    <Badge variant="secondary" className="bg-violet-900/20 text-violet-300 border-violet-800 px-3 py-1">
-                                                        {thread.tags[0]}
+                    <TabsContent value="scripts" className="mt-8">
+                        <div className="grid gap-6">
+                            {pendingThreads?.map(thread => (
+                                <Card key={thread.id} className="bg-zinc-900/50 border-zinc-800 overflow-hidden backdrop-blur-sm hover:border-fuchsia-500/30 transition-all duration-300 group">
+                                    <div className="p-6">
+                                        <div className="flex items-start justify-between gap-6">
+                                            <div className="space-y-4 flex-1">
+                                                <div className="flex items-center gap-3">
+                                                    <Badge variant="outline" className="border-fuchsia-900 text-fuchsia-400 bg-fuchsia-900/10 px-3 py-1">
+                                                        {thread.is_resource ? 'Script/Resource' : 'Thread'}
                                                     </Badge>
-                                                )}
-                                                <span className="text-zinc-500 text-sm flex items-center gap-1">
-                                                    <img src="https://img.icons8.com/3d-fluency/94/user-male-circle.png" className="w-4 h-4" alt="User" />
-                                                    {thread.author_name}
-                                                </span>
-                                                <span className="text-zinc-600 text-sm">•</span>
-                                                <span className="text-zinc-500 text-sm">
-                                                    {new Date(thread.created_date).toLocaleString()}
-                                                </span>
-                                            </div>
-                                            <h3 className="text-2xl font-bold text-white group-hover:text-fuchsia-400 transition-colors">{thread.title}</h3>
-
-                                            {thread.virus_scan_link && (
-                                                <div className="bg-zinc-950/50 border border-zinc-800 p-3 rounded-lg inline-flex items-center gap-2 text-sm text-emerald-400">
-                                                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/antivirus-3d-icon-png-download-4159679.png" className="w-5 h-5" alt="Safe" />
-                                                    <span>Virus Scan:</span>
-                                                    <a href={thread.virus_scan_link} target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-300">
-                                                        {thread.virus_scan_link}
-                                                    </a>
+                                                    {thread.tags && thread.tags.length > 0 && (
+                                                        <Badge variant="secondary" className="bg-violet-900/20 text-violet-300 border-violet-800 px-3 py-1">
+                                                            {thread.tags[0]}
+                                                        </Badge>
+                                                    )}
+                                                    <span className="text-zinc-500 text-sm flex items-center gap-1">
+                                                        <img src="https://img.icons8.com/3d-fluency/94/user-male-circle.png" className="w-4 h-4" alt="User" />
+                                                        {thread.author_name}
+                                                    </span>
+                                                    <span className="text-zinc-600 text-sm">•</span>
+                                                    <span className="text-zinc-500 text-sm">
+                                                        {new Date(thread.created_date).toLocaleString()}
+                                                    </span>
                                                 </div>
-                                            )}
+                                                <h3 className="text-2xl font-bold text-white group-hover:text-fuchsia-400 transition-colors">{thread.title}</h3>
 
-                                            <div className="bg-zinc-950/80 border border-zinc-800 p-4 rounded-xl text-zinc-300 text-sm max-h-[200px] overflow-y-auto shadow-inner"
-                                                dangerouslySetInnerHTML={{ __html: thread.content }}
-                                            />
-                                        </div>
+                                                {thread.virus_scan_link && (
+                                                    <div className="bg-zinc-950/50 border border-zinc-800 p-3 rounded-lg inline-flex items-center gap-2 text-sm text-emerald-400">
+                                                        <img src="https://cdn3d.iconscout.com/3d/premium/thumb/antivirus-3d-icon-png-download-4159679.png" className="w-5 h-5" alt="Safe" />
+                                                        <span>Virus Scan:</span>
+                                                        <a href={thread.virus_scan_link} target="_blank" rel="noopener noreferrer" className="underline hover:text-emerald-300">
+                                                            {thread.virus_scan_link}
+                                                        </a>
+                                                    </div>
+                                                )}
 
-                                        <div className="flex flex-col gap-3 min-w-[160px]">
-                                            <Button
-                                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-900/20"
-                                                onClick={() => reviewThreadMutation.mutate({ id: thread.id, status: 'active' })}
-                                            >
-                                                <img src="https://img.icons8.com/3d-fluency/94/checkmark.png" className="w-5 h-5 mr-2" alt="Approve" /> Approve
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                className="w-full border-red-900/50 text-red-400 hover:bg-red-950/30 hover:text-red-300"
-                                                onClick={() => reviewThreadMutation.mutate({ id: thread.id, status: 'rejected' })}
-                                            >
-                                                <img src="https://img.icons8.com/3d-fluency/94/cancel.png" className="w-5 h-5 mr-2" alt="Reject" /> Reject
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))}
-                        {pendingThreads?.length === 0 && (
-                            <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 border-dashed">
-                                <img src="https://img.icons8.com/3d-fluency/94/checked.png" className="w-20 h-20 mx-auto mb-6 opacity-80" alt="Done" />
-                                <p className="text-xl font-medium text-zinc-300">All caught up!</p>
-                                <p className="text-sm mt-2">No pending scripts to review.</p>
-                            </div>
-                        )}
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="reports" className="mt-8">
-                    <div className="grid gap-6">
-                        {reports?.map(report => (
-                            <ReportCard
-                                key={report.id}
-                                report={report}
-                                onResolve={resolveReportMutation.mutate}
-                                onBan={toggleBanMutation.mutate}
-                            />
-                        ))}
-                        {reports?.length === 0 && (
-                            <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 border-dashed">
-                                <img src="https://img.icons8.com/3d-fluency/94/checked.png" className="w-20 h-20 mx-auto mb-6 opacity-80" alt="Clear" />
-                                <p className="text-xl font-medium text-zinc-300">All clear! No pending reports.</p>
-                            </div>
-                        )}
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="users" className="mt-8">
-                    <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <img src="https://img.icons8.com/3d-fluency/94/conference-call.png" className="w-8 h-8" alt="Users" />
-                                User Management
-                            </CardTitle>
-                            <CardDescription>View and manage registered users.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="mb-6 flex gap-4">
-                                <div className="relative flex-1">
-                                    <img src="https://img.icons8.com/3d-fluency/94/search.png" className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 opacity-50" alt="Search" />
-                                    <Input
-                                        placeholder="Search users by email..."
-                                        className="pl-12 bg-zinc-950 border-zinc-800 h-12 text-lg"
-                                        value={userSearch}
-                                        onChange={(e) => setUserSearch(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                {usersList?.filter(u => u.user_email.includes(userSearch)).map(profile => (
-                                    <div key={profile.id} className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-all">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden ring-2 ring-zinc-800">
-                                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.user_email}`} alt="avatar" />
+                                                <div className="bg-zinc-950/80 border border-zinc-800 p-4 rounded-xl text-zinc-300 text-sm max-h-[200px] overflow-y-auto shadow-inner"
+                                                    dangerouslySetInnerHTML={{ __html: thread.content }}
+                                                />
                                             </div>
-                                            <div>
-                                                <div className="font-bold text-white text-lg">{profile.full_name || 'User'}</div>
-                                                <div className="text-sm text-zinc-500">{profile.user_email}</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            {profile.is_banned ? (
+
+                                            <div className="flex flex-col gap-3 min-w-[160px]">
+                                                <Button
+                                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-900/20"
+                                                    onClick={() => reviewThreadMutation.mutate({ id: thread.id, status: 'active' })}
+                                                >
+                                                    <img src="https://img.icons8.com/3d-fluency/94/checkmark.png" className="w-5 h-5 mr-2" alt="Approve" /> Approve
+                                                </Button>
                                                 <Button
                                                     variant="outline"
-                                                    className="border-emerald-900 text-emerald-500 hover:bg-emerald-900/20 h-10 px-4"
-                                                    onClick={() => toggleBanMutation.mutate({ email: profile.user_email, isBanned: false })}
+                                                    className="w-full border-red-900/50 text-red-400 hover:bg-red-950/30 hover:text-red-300"
+                                                    onClick={() => reviewThreadMutation.mutate({ id: thread.id, status: 'rejected' })}
                                                 >
-                                                    <img src="https://img.icons8.com/3d-fluency/94/unlock.png" className="w-5 h-5 mr-2" alt="Unban" /> Unban
+                                                    <img src="https://img.icons8.com/3d-fluency/94/cancel.png" className="w-5 h-5 mr-2" alt="Reject" /> Reject
                                                 </Button>
-                                            ) : (
-                                                <Button
-                                                    variant="outline"
-                                                    className="border-red-900 text-red-500 hover:bg-red-900/20 h-10 px-4"
-                                                    onClick={() => toggleBanMutation.mutate({ email: profile.user_email, isBanned: true })}
-                                                >
-                                                    <img src="https://img.icons8.com/3d-fluency/94/denied.png" className="w-5 h-5 mr-2" alt="Ban" /> Ban
-                                                </Button>
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
-        </div>
+                                </Card>
+                            ))}
+                            {pendingThreads?.length === 0 && (
+                                <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 border-dashed">
+                                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/pending-3d-icon-png-download-5326994.png" className="w-20 h-20 mx-auto mb-6 opacity-80" alt="Done" />
+                                    <p className="text-xl font-medium text-zinc-300">All caught up!</p>
+                                    <p className="text-sm mt-2">No pending scripts to review.</p>
+                                </div>
+                            )}
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="reports" className="mt-8">
+                        <div className="grid gap-6">
+                            {reports?.map(report => (
+                                <ReportCard
+                                    key={report.id}
+                                    report={report}
+                                    onResolve={resolveReportMutation.mutate}
+                                    onBan={toggleBanMutation.mutate}
+                                />
+                            ))}
+                            {reports?.length === 0 && (
+                                <div className="text-center py-20 text-zinc-500 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 border-dashed">
+                                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/pending-3d-icon-png-download-5326994.png" className="w-20 h-20 mx-auto mb-6 opacity-80" alt="Clear" />
+                                    <p className="text-xl font-medium text-zinc-300">All clear! No pending reports.</p>
+                                </div>
+                            )}
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="users" className="mt-8">
+                        <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-3">
+                                    <img src="https://img.icons8.com/3d-fluency/94/conference-call.png" className="w-8 h-8" alt="Users" />
+                                    User Management
+                                </CardTitle>
+                                <CardDescription>View and manage registered users.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="mb-6 flex gap-4">
+                                    <div className="relative flex-1">
+                                        <img src="https://img.icons8.com/3d-fluency/94/search.png" className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 opacity-50" alt="Search" />
+                                        <Input
+                                            placeholder="Search users by email..."
+                                            className="pl-12 bg-zinc-950 border-zinc-800 h-12 text-lg"
+                                            value={userSearch}
+                                            onChange={(e) => setUserSearch(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {usersList?.filter(u => u.user_email.includes(userSearch)).map(profile => (
+                                        <div key={profile.id} className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-all">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden ring-2 ring-zinc-800">
+                                                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.user_email}`} alt="avatar" />
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-white text-lg">{profile.full_name || 'User'}</div>
+                                                    <div className="text-sm text-zinc-500">{profile.user_email}</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                {profile.is_banned ? (
+                                                    <Button
+                                                        variant="outline"
+                                                        className="border-emerald-900 text-emerald-500 hover:bg-emerald-900/20 h-10 px-4"
+                                                        onClick={() => toggleBanMutation.mutate({ email: profile.user_email, isBanned: false })}
+                                                    >
+                                                        <img src="https://img.icons8.com/3d-fluency/94/unlock.png" className="w-5 h-5 mr-2" alt="Unban" /> Unban
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        variant="outline"
+                                                        className="border-red-900 text-red-500 hover:bg-red-900/20 h-10 px-4"
+                                                        onClick={() => toggleBanMutation.mutate({ email: profile.user_email, isBanned: true })}
+                                                    >
+                                                        <img src="https://img.icons8.com/3d-fluency/94/denied.png" className="w-5 h-5 mr-2" alt="Ban" /> Ban
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                </Tabs>
+            </div>
         </>
     );
 }
@@ -386,7 +386,7 @@ function ReportCard({ report, onResolve, onBan }) {
                         className="justify-start border-zinc-700 hover:bg-zinc-800 text-zinc-300 h-10"
                         onClick={() => onResolve({ id: report.id, status: 'dismissed', notes: 'Dismissed by mod' })}
                     >
-                        <img src="https://img.icons8.com/3d-fluency/94/checked.png" className="w-5 h-5 mr-2" alt="Dismiss" /> Dismiss
+                        <img src="https://cdn3d.iconscout.com/3d/premium/thumb/pending-3d-icon-png-download-5326994.png" className="w-5 h-5 mr-2" alt="Dismiss" /> Dismiss
                     </Button>
                     <Button
                         variant="outline"

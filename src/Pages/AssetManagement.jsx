@@ -87,7 +87,11 @@ export default function AssetManagement() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Asset.create(data),
+    mutationFn: (data) => base44.entities.Asset.create({
+      ...data,
+      uploaded_by: user?.email,
+      uploader_name: user?.username || user?.full_name || 'Admin'
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries(['assets-admin']);
       toast.success('Asset created successfully');
@@ -511,6 +515,12 @@ export default function AssetManagement() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-xs text-zinc-500 mb-3">
+                        {asset.uploader_name && (
+                          <span className="flex items-center gap-1">
+                            <img src="https://img.icons8.com/3d-fluency/94/user-male-circle.png" className="w-3 h-3" alt="" />
+                            {asset.uploader_name}
+                          </span>
+                        )}
                         {asset.framework && <span>Framework: {asset.framework}</span>}
                         {asset.version && <span>v{asset.version}</span>}
                         {asset.file_size && <span>{asset.file_size}</span>}

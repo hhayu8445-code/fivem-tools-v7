@@ -65,6 +65,14 @@
     "author": {
       "type": "string"
     },
+    "uploaded_by": {
+      "type": "string",
+      "description": "Email user yang upload"
+    },
+    "uploader_name": {
+      "type": "string",
+      "description": "Nama user yang upload"
+    },
     "is_premium": {
       "type": "boolean",
       "default": false
