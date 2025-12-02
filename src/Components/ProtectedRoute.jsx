@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { isAdmin, isModerator } from '@/utils/adminConfig';
+import { ADMIN_CONFIG } from '@/config/admin';
 
 export default function ProtectedRoute({ children, requireAdmin = false, requireMod = false }) {
   const [isAuth, setIsAuth] = React.useState(null);
@@ -18,9 +18,9 @@ export default function ProtectedRoute({ children, requireAdmin = false, require
         setUser(currentUser);
         
         if (requireAdmin) {
-          setHasAccess(isAdmin(currentUser));
+          setHasAccess(ADMIN_CONFIG.isAdmin(currentUser.id));
         } else if (requireMod) {
-          const modAccess = await isModerator(currentUser);
+          const modAccess = await ADMIN_CONFIG.isModerator(currentUser);
           setHasAccess(modAccess);
         } else {
           setHasAccess(true);

@@ -23,10 +23,13 @@ Premium platform untuk FiveM scripts, vehicles, MLOs, dan community forum.
 ### 💬 Community Forum
 - Multiple categories (Announcements, General, Help, Scripts, Jobs)
 - Create threads & replies
-- Like system & reputation
+- **Edit threads & replies** - Author, admin, and moderator can edit
+- Like system & reputation (upvote/downvote)
 - Report system untuk moderasi
 - Poll creation with voting
-- Rich text editor (Quill)
+- Rich text editor (ReactQuill)
+- User badges & signatures
+- Thread pinning & locking (admin/mod)
 
 ### 💌 Direct Messages
 - Private messaging antar users
@@ -130,12 +133,12 @@ VITE_DISCORD_WEBHOOK_URL=your_discord_webhook_url
 
 ## 📚 Documentation
 
-- [Deployment Guide](./DEPLOYMENT_GUIDE.md) - Panduan deploy ke Vercel
-- [Setup Discord Auth](./SETUP_DISCORD_AUTH.md) - Setup Discord OAuth
-- [Upvotes Server](./UPVOTES_SERVER_README.md) - FiveM server upvote system
-- **[Implementation Complete](./IMPLEMENTATION_COMPLETE.md)** - 5 new features documentation
-- **[Features Summary](./FEATURES_SUMMARY.md)** - Complete features overview
-- **[Quick Start Guide](./QUICK_START.md)** - 5-minute setup guide
+- [Complete Documentation](./DOCS_CONSOLIDATED.md) - All-in-one guide
+- [Deployment Guide](./DEPLOYMENT_GUIDE.md) - Deploy to Vercel
+- [Discord Auth Setup](./SETUP_DISCORD_AUTH.md) - OAuth configuration
+- [Features Summary](./FEATURES_SUMMARY.md) - Complete features
+- [Quick Start](./QUICK_START.md) - 5-minute setup
+- [Changelog](./CHANGELOG.md) - Version history
 
 ## 🔐 Discord OAuth Setup
 

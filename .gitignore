@@ -27,3 +27,16 @@ dist-ssr
 .env
 .env.local
 .env.production
+
+# Build files
+build/
+out/
+
+# Temporary files
+*.tmp
+*.temp
+*.zip
+
+# OS files
+Thumbs.db
+.DS_Store

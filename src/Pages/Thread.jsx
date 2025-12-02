@@ -422,6 +422,15 @@ export default function Thread() {
                                     </Button>
                                 </div>
                             )}
+                            {(user?.email === thread.author_email || isAdminOrMod) && (
+                                <Button
+                                    size="sm" variant="ghost"
+                                    className="text-zinc-400 hover:text-fuchsia-400"
+                                    onClick={() => navigate(`/community/edit-thread/${thread.id}`)}
+                                >
+                                    <img src="https://img.icons8.com/3d-fluency/94/edit.png" className="w-4 h-4 mr-1" alt="Edit" /> Edit
+                                </Button>
+                            )}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><img src="https://img.icons8.com/3d-fluency/94/menu.png" className="w-4 h-4" alt="More" /></Button>
@@ -497,7 +506,18 @@ export default function Thread() {
                                     <UserSignature email={reply.author_email} />
                                     <div className="flex items-center justify-between gap-2 border-t border-zinc-800/50 pt-2">
                                         <VoteControl targetId={reply.id} targetType="reply" initialScore={reply.score || 0} authorEmail={reply.author_email} />
-                                        <ReportButton targetId={reply.id} targetType="reply" />
+                                        <div className="flex gap-2">
+                                            {(user?.email === reply.author_email || isAdminOrMod) && (
+                                                <Button
+                                                    size="sm" variant="ghost"
+                                                    className="text-zinc-400 hover:text-fuchsia-400"
+                                                    onClick={() => navigate(`/community/edit-reply/${reply.id}`)}
+                                                >
+                                                    <img src="https://img.icons8.com/3d-fluency/94/edit.png" className="w-4 h-4 mr-1" alt="Edit" /> Edit
+                                                </Button>
+                                            )}
+                                            <ReportButton targetId={reply.id} targetType="reply" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -7,7 +7,7 @@ import Layout from './Layout';
 import OfflineIndicator from './Components/OfflineIndicator';
 import ErrorBoundary from './Components/ErrorBoundary';
 import { useUpdatePresence } from './hooks/useRealtime';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from './hooks/useAuth';
 import 'nprogress/nprogress.css';
 
 // Pages
@@ -22,6 +22,8 @@ import Messages from './Pages/Messages';
 import ForumCategory from './Pages/ForumCategory';
 import Thread from './Pages/Thread';
 import CreateThread from './Pages/CreateThread';
+import EditThread from './Pages/EditThread';
+import EditReply from './Pages/EditReply';
 import ForumSearch from './Pages/ForumSearch';
 import Admin from './Pages/Admin';
 import ModDashboard from './Pages/ModDashboard';
@@ -46,25 +48,7 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  const [user, setUser] = React.useState(null);
-
-  React.useEffect(() => {
-    const fetchUser = () => {
-      base44.auth.me().then(setUser).catch(() => {});
-    };
-    fetchUser();
-
-    // Listen for auth changes
-    const handleAuthChange = () => {
-      fetchUser();
-    };
-    window.addEventListener('auth-changed', handleAuthChange);
-
-    return () => {
-      window.removeEventListener('auth-changed', handleAuthChange);
-    };
-  }, []);
-
+  const { user } = useAuth();
   useUpdatePresence(user?.email);
 
   return (
@@ -79,6 +63,8 @@ function AppContent() {
               <Route path="/community" element={<Community />} />
               <Route path="/community/category/:id" element={<ForumCategory />} />
               <Route path="/community/thread/:id" element={<Thread />} />
+              <Route path="/community/edit-thread/:id" element={<ProtectedRoute><EditThread /></ProtectedRoute>} />
+              <Route path="/community/edit-reply/:id" element={<ProtectedRoute><EditReply /></ProtectedRoute>} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/decrypt-assets" element={<ProtectedRoute><DecryptAssets /></ProtectedRoute>} />
               <Route path="/upvotes-server" element={<UpvotesServer />} />

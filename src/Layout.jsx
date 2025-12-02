@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import NProgress from 'nprogress';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 import { logToDiscord } from '@/utils';
+import { useAllStats } from '@/hooks/useStats';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,45 +37,7 @@ const navItems = [
 
 const SidebarContent = () => {
   const location = useLocation();
-
-  // Real-time stats
-  const { data: onlineCount } = useQuery({
-    queryKey: ['onlineCount'],
-    queryFn: async () => {
-      const users = await base44.entities.UserProfile.list({ sort: { last_seen: -1 }, limit: 100 });
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      return users.filter(u => new Date(u.last_seen) > fiveMinutesAgo).length;
-    },
-    refetchInterval: 5000 // Update every 5 seconds
-  });
-
-  const { data: totalMembers } = useQuery({
-    queryKey: ['totalMembers'],
-    queryFn: async () => {
-      const users = await base44.entities.UserProfile.list({ limit: 1000 });
-      return users.length;
-    },
-    refetchInterval: 30000 // Update every 30 seconds
-  });
-
-  const { data: totalAssets } = useQuery({
-    queryKey: ['totalAssets'],
-    queryFn: async () => {
-      const assets = await base44.entities.Asset.list({ limit: 1000 });
-      return assets.length;
-    },
-    refetchInterval: 60000 // Update every 60 seconds
-  });
-
-  const { data: todayDownloads } = useQuery({
-    queryKey: ['todayDownloads'],
-    queryFn: async () => {
-      const logs = await base44.entities.DownloadLog.list({ limit: 1000 });
-      const today = new Date().toDateString();
-      return logs.filter(l => new Date(l.download_date).toDateString() === today).length;
-    },
-    refetchInterval: 10000 // Update every 10 seconds
-  });
+  const { onlineCount, totalMembers, totalAssets, todayDownloads } = useAllStats();
 
   return (
     <div className="flex flex-col h-full">
@@ -134,7 +97,7 @@ const SidebarContent = () => {
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] font-medium text-emerald-400 uppercase tracking-wider">Online</span>
               </div>
-              <div className="text-xl font-bold text-white">{onlineCount || 0}</div>
+              <div className="text-xl font-bold text-white">{onlineCount}</div>
               <div className="text-[9px] text-zinc-500">Active users</div>
             </div>
           </div>
@@ -147,7 +110,7 @@ const SidebarContent = () => {
                 <img src="https://img.icons8.com/3d-fluency/94/conference-call.png" className="w-3 h-3" alt="Users" />
                 <span className="text-[10px] font-medium text-violet-400 uppercase tracking-wider">Members</span>
               </div>
-              <div className="text-xl font-bold text-white">{totalMembers || 0}</div>
+              <div className="text-xl font-bold text-white">{totalMembers}</div>
               <div className="text-[9px] text-zinc-500">Registered</div>
             </div>
           </div>
@@ -160,7 +123,7 @@ const SidebarContent = () => {
                 <img src="https://img.icons8.com/3d-fluency/94/box.png" className="w-3 h-3" alt="Assets" />
                 <span className="text-[10px] font-medium text-fuchsia-400 uppercase tracking-wider">Assets</span>
               </div>
-              <div className="text-xl font-bold text-white">{totalAssets || 0}</div>
+              <div className="text-xl font-bold text-white">{totalAssets}</div>
               <div className="text-[9px] text-zinc-500">Resources</div>
             </div>
           </div>
@@ -173,7 +136,7 @@ const SidebarContent = () => {
                 <img src="https://img.icons8.com/3d-fluency/94/download-from-cloud.png" className="w-3 h-3" alt="Downloads" />
                 <span className="text-[10px] font-medium text-amber-400 uppercase tracking-wider">Today</span>
               </div>
-              <div className="text-xl font-bold text-white">{todayDownloads || 0}</div>
+              <div className="text-xl font-bold text-white">{todayDownloads}</div>
               <div className="text-[9px] text-zinc-500">Downloads</div>
             </div>
           </div>
@@ -217,18 +180,11 @@ export default function Layout({ children }) {
         if (await base44.auth.isAuthenticated()) {
           const currentUser = await base44.auth.me();
           setUser(currentUser);
-          logToDiscord('User Login', {
-            type: 'login',
-            user: currentUser.full_name || currentUser.username,
-            email: currentUser.email,
-            description: '✅ User logged in successfully'
-          });
 
-          // Update last_seen and get profile
+          // Get profile
           const profiles = await base44.entities.UserProfile.list({ query: { user_email: currentUser.email } });
           if (profiles.length > 0) {
             setUserProfile(profiles[0]);
-            await base44.entities.UserProfile.update(profiles[0].id, { last_seen: new Date().toISOString() });
           }
         }
       } catch (error) {
@@ -237,38 +193,14 @@ export default function Layout({ children }) {
     };
     fetchUser();
 
-    // Listen for storage changes (login from another tab or after callback)
-    const handleStorageChange = (e) => {
-      if (e.key === 'discord_user' || e.key === 'discord_token') {
-        fetchUser();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-
-    // Custom event for same-tab login
-    const handleAuthChange = () => {
-      fetchUser();
-    };
+    // Listen for auth changes
+    const handleAuthChange = () => fetchUser();
     window.addEventListener('auth-changed', handleAuthChange);
-
-    // Heartbeat for online status every 2 minutes
-    const interval = setInterval(async () => {
-      try {
-        if (await base44.auth.isAuthenticated()) {
-          const currentUser = await base44.auth.me();
-          const profiles = await base44.entities.UserProfile.list({ query: { user_email: currentUser.email } });
-          if (profiles.length > 0) {
-            await base44.entities.UserProfile.update(profiles[0].id, { last_seen: new Date().toISOString() });
-          }
-        }
-      } catch (error) {
-        console.error("Heartbeat failed:", error);
-      }
-    }, 120000);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'discord_user' || e.key === 'discord_token') fetchUser();
+    });
 
     return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('auth-changed', handleAuthChange);
     };
   }, []);
