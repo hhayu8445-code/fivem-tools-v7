@@ -60,14 +60,13 @@ export default function DecryptAssets() {
 
     // Validate channel ID (must be from your Discord server)
     const VALID_CHANNEL_IDS = [
-      '1445328264615952493', // Replace with your actual vouch channel ID
-      '1404452656906375210'  // Add more channel IDs if needed
+      '1442560874157178911' // ✅┃trusted-reviews
     ];
 
     if (!VALID_CHANNEL_IDS.includes(channelId)) {
       setStatus({
         type: 'error',
-        message: 'Vouch must be from the official vouch channel. Join our Discord and post in #vouch channel.'
+        message: 'Review must be from ✅┃trusted-reviews channel. Join our Discord and post your review there.'
       });
       return false;
     }
@@ -337,7 +336,7 @@ export default function DecryptAssets() {
                           <span className="text-xs font-bold text-fuchsia-400">2</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-zinc-300 font-medium">Post a vouch message in #vouch channel</p>
+                          <p className="text-sm text-zinc-300 font-medium">Post a review in ✅┃trusted-reviews channel</p>
                           <p className="text-xs text-zinc-500 mt-1">Example: "Great service! Fast decrypt and secure."</p>
                         </div>
                       </div>
@@ -354,7 +353,7 @@ export default function DecryptAssets() {
 
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-zinc-300">
-                        Vouch Message Link <span className="text-red-400">*</span>
+                        Review Message Link <span className="text-red-400">*</span>
                       </label>
                       <Input
                         type="text"
@@ -363,7 +362,7 @@ export default function DecryptAssets() {
                         value={vouchLink}
                         onChange={(e) => setVouchLink(e.target.value)}
                       />
-                      <p className="text-xs text-zinc-500">Paste your Discord vouch message link here</p>
+                      <p className="text-xs text-zinc-500">Paste your Discord review message link from ✅┃trusted-reviews</p>
                     </div>
 
                     <Button
