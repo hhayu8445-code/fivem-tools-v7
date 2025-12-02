@@ -1,4 +1,5 @@
 {
+  "name": "fivem-tools-v7",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
