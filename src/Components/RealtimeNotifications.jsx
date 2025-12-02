@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function RealtimeNotifications({ userEmail }) {
   const navigate = useNavigate();
-  const [lastCheck, setLastCheck] = React.useState(Date.now());
+  const lastCheckRef = useRef(Date.now());
 
   const { data: notifications } = useQuery({
     queryKey: ['realtime-notifications', userEmail],
@@ -37,7 +37,7 @@ export default function RealtimeNotifications({ userEmail }) {
       const newNotifications = notifications.filter(n => {
         if (!n || !n.created_date) return false;
         const notifTime = new Date(n.created_date).getTime();
-        return notifTime > lastCheck;
+        return notifTime > lastCheckRef.current;
       });
 
       if (newNotifications.length > 0) {
@@ -59,12 +59,12 @@ export default function RealtimeNotifications({ userEmail }) {
           });
         });
         
-        setLastCheck(Date.now());
+        lastCheckRef.current = Date.now();
       }
     } catch (error) {
       console.error('Notification processing error:', error);
     }
-  }, [notifications, lastCheck, navigate]);
+  }, [notifications, navigate]);
 
   return null;
 }
