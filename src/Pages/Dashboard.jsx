@@ -87,10 +87,7 @@ export default function Dashboard() {
   React.useEffect(() => {
     if (loading) return;
     setShowLoginModal(!user);
-      setUser(u);
-    };
-    load();
-  }, []);
+  }, [user, loading]);
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['profile', user?.email],

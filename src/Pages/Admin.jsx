@@ -80,13 +80,17 @@ export default function Admin() {
   };
 
   // Analytics queries
+  // ✅ OPTIMIZED: Added pagination and date filtering instead of loading 1000+ records
   const { data: analytics } = useQuery({
     queryKey: ['analytics'],
     queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
       const [assets, downloads, users] = await Promise.all([
-        base44.entities.Asset.list({ limit: 1000 }),
-        base44.entities.DownloadLog.list({ limit: 1000 }),
-        base44.entities.UserProfile.list({ limit: 1000 })
+        base44.entities.Asset.list({ limit: 100, sort: '-created_at' }), // Paginate: 100 instead of 1000
+        base44.entities.DownloadLog.list({ limit: 500, date_filter: { start: thirtyDaysAgo, end: today } }), // Filter by date range
+        base44.entities.UserProfile.list({ limit: 100, sort: '-created_at' }) // Paginate: 100 instead of 1000
       ]);
 
       const categoryData = assets.reduce((acc, asset) => {

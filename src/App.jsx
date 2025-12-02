@@ -57,30 +57,30 @@ function AppContent() {
       <RealtimeNotifications userEmail={user?.email} />
       <Layout>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/asset" element={<Asset />} />
-              <Route path="/membership" element={<Membership />} />
-              <Route path="/community" element={<Community />} />
-              <Route path="/community/category/:id" element={<ForumCategory />} />
-              <Route path="/community/thread/:id" element={<Thread />} />
-              <Route path="/community/edit-thread/:id" element={<ProtectedRoute><EditThread /></ProtectedRoute>} />
-              <Route path="/community/edit-reply/:id" element={<ProtectedRoute><EditReply /></ProtectedRoute>} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/decrypt-assets" element={<ProtectedRoute><DecryptAssets /></ProtectedRoute>} />
-              <Route path="/upvotes-server" element={<UpvotesServer />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/community/create-thread" element={<ProtectedRoute><CreateThread /></ProtectedRoute>} />
-              <Route path="/community/search" element={<ProtectedRoute><ForumSearch /></ProtectedRoute>} />
-              <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-              <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
-              <Route path="/admin/vouches" element={<ProtectedRoute requireAdmin={true}><VouchAdmin /></ProtectedRoute>} />
-              <Route path="/admin/assets" element={<ProtectedRoute requireAdmin={true}><AssetManagement /></ProtectedRoute>} />
-              <Route path="/mod" element={<ProtectedRoute requireMod={true}><ModDashboard /></ProtectedRoute>} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
+              <Route path="/explore" element={<ErrorBoundary><Explore /></ErrorBoundary>} />
+              <Route path="/asset" element={<ErrorBoundary><Asset /></ErrorBoundary>} />
+              <Route path="/membership" element={<ErrorBoundary><Membership /></ErrorBoundary>} />
+              <Route path="/community" element={<ErrorBoundary><Community /></ErrorBoundary>} />
+              <Route path="/community/category/:id" element={<ErrorBoundary><ForumCategory /></ErrorBoundary>} />
+              <Route path="/community/thread/:id" element={<ErrorBoundary><Thread /></ErrorBoundary>} />
+              <Route path="/community/edit-thread/:id" element={<ErrorBoundary><ProtectedRoute><EditThread /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/community/edit-reply/:id" element={<ErrorBoundary><ProtectedRoute><EditReply /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/profile" element={<ErrorBoundary><Profile /></ErrorBoundary>} />
+              <Route path="/decrypt-assets" element={<ErrorBoundary><ProtectedRoute><DecryptAssets /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/upvotes-server" element={<ErrorBoundary><UpvotesServer /></ErrorBoundary>} />
+              <Route path="/dashboard" element={<ErrorBoundary><ProtectedRoute><Dashboard /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/community/create-thread" element={<ErrorBoundary><ProtectedRoute><CreateThread /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/community/search" element={<ErrorBoundary><ProtectedRoute><ForumSearch /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/messages" element={<ErrorBoundary><ProtectedRoute><Messages /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/admin" element={<ErrorBoundary><ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/admin/vouches" element={<ErrorBoundary><ProtectedRoute requireAdmin={true}><VouchAdmin /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/admin/assets" element={<ErrorBoundary><ProtectedRoute requireAdmin={true}><AssetManagement /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/mod" element={<ErrorBoundary><ProtectedRoute requireMod={true}><ModDashboard /></ProtectedRoute></ErrorBoundary>} />
+              <Route path="/terms" element={<ErrorBoundary><Terms /></ErrorBoundary>} />
+              <Route path="/privacy" element={<ErrorBoundary><Privacy /></ErrorBoundary>} />
+              <Route path="/auth/callback" element={<ErrorBoundary><AuthCallback /></ErrorBoundary>} />
+              <Route path="*" element={<ErrorBoundary><NotFound /></ErrorBoundary>} />
             </Routes>
           </Layout>
       </Router>
