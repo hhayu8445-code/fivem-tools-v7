@@ -53,10 +53,9 @@ function AppContent() {
   useUpdatePresence(user?.email);
 
   return (
-    <ErrorBoundary>
+    <Router>
       <RealtimeNotifications userEmail={user?.email} />
-      <Router>
-          <Layout>
+      <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/explore" element={<Explore />} />
@@ -84,20 +83,21 @@ function AppContent() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
-        </Router>
-    </ErrorBoundary>
+      </Router>
   );
 }
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <Toaster position="top-right" theme="dark" richColors closeButton />
-        <OfflineIndicator />
-        <AppContent />
-      </HelmetProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <Toaster position="top-right" theme="dark" richColors closeButton />
+          <OfflineIndicator />
+          <AppContent />
+        </HelmetProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
