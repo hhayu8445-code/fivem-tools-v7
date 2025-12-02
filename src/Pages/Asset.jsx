@@ -181,14 +181,70 @@ export default function AssetDetail() {
                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <img src="https://img.icons8.com/3d-fluency/94/document.png" className="w-8 h-8" alt="Description" /> Description
                             </h2>
-                            <div className="prose prose-invert max-w-none text-zinc-400">
-                                <p>{asset.description}</p>
-                                {/* Placeholder for more content since description is short in dummy data */}
-                                <p className="mt-4">
-                                    This asset is optimized for FiveM servers running {framework.toUpperCase()}.
-                                    It includes optimized code, clean UI, and is fully configurable via config.lua.
-                                    Ensure you have the latest artifacts installed before running.
-                                </p>
+                            <div className="prose prose-invert max-w-none">
+                                <div className="text-zinc-300 leading-relaxed space-y-4">
+                                    {asset.description?.split('\n').map((paragraph, i) => (
+                                        <p key={i} className="text-zinc-400">{paragraph}</p>
+                                    ))}
+                                </div>
+                                
+                                {/* Features Section */}
+                                <div className="mt-6 pt-6 border-t border-zinc-800">
+                                    <h3 className="text-lg font-semibold text-white mb-3">✨ Features</h3>
+                                    <ul className="space-y-2 text-zinc-400">
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-fuchsia-400 mt-1">•</span>
+                                            <span>Optimized for {framework.toUpperCase()} framework</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-fuchsia-400 mt-1">•</span>
+                                            <span>Clean and modern UI design</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-fuchsia-400 mt-1">•</span>
+                                            <span>Fully configurable via config.lua</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-fuchsia-400 mt-1">•</span>
+                                            <span>Regular updates and bug fixes</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-fuchsia-400 mt-1">•</span>
+                                            <span>Discord support available</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                {/* Requirements */}
+                                <div className="mt-6 pt-6 border-t border-zinc-800">
+                                    <h3 className="text-lg font-semibold text-white mb-3">📋 Requirements</h3>
+                                    <ul className="space-y-2 text-zinc-400">
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400 mt-1">•</span>
+                                            <span>Latest FiveM artifacts (recommended)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400 mt-1">•</span>
+                                            <span>{framework.toUpperCase()} framework installed</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400 mt-1">•</span>
+                                            <span>MySQL database (if applicable)</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                {/* Installation */}
+                                <div className="mt-6 pt-6 border-t border-zinc-800">
+                                    <h3 className="text-lg font-semibold text-white mb-3">🔧 Installation</h3>
+                                    <ol className="space-y-2 text-zinc-400 list-decimal list-inside">
+                                        <li>Download and extract the resource</li>
+                                        <li>Place it in your resources folder</li>
+                                        <li>Add to server.cfg: <code className="text-fuchsia-400 bg-zinc-950 px-2 py-1 rounded">ensure {asset.title?.toLowerCase().replace(/\s+/g, '-')}</code></li>
+                                        <li>Configure settings in config.lua</li>
+                                        <li>Restart your server</li>
+                                    </ol>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -244,6 +300,28 @@ export default function AssetDetail() {
                                         {asset.created_date ? format(new Date(asset.created_date), 'MMM d, yyyy') : 'N/A'}
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Virus Check */}
+                            <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    <span className="text-sm font-semibold text-green-400">Virus Scan</span>
+                                </div>
+                                <p className="text-xs text-zinc-400 mb-3">Check this file for viruses before downloading</p>
+                                <a 
+                                    href={`https://www.virustotal.com/gui/url/${encodeURIComponent(asset.download_url)}/detection`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors font-medium"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                    Check on VirusTotal
+                                </a>
                             </div>
 
                             <div className="flex gap-2 mt-4">
