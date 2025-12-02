@@ -7,28 +7,24 @@ import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { toast } from 'sonner';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import LoginRequiredModal from '@/Components/LoginRequiredModal';
+import RichTextEditor from '@/Components/RichTextEditor';
+import { useAuth } from '@/hooks/useAuth';
 import { logToDiscord } from '@/utils';
 import { validateThreadTitle, validateThreadContent, sanitizeInput, rateLimit } from '@/utils/security';
 
 export default function CreateThread() {
-  const [user, setUser] = React.useState(null);
+  const { user, loading } = useAuth();
   const [showLoginModal, setShowLoginModal] = React.useState(false);
   const navigate = useNavigate();
   
   React.useEffect(() => {
-      base44.auth.me().then(u => {
-          if (!u) {
-              setShowLoginModal(true);
-              return;
-          }
-          setUser(u);
-      }).catch(() => setShowLoginModal(true));
-  }, []);
+    if (!loading && !user) {
+      setShowLoginModal(true);
+    }
+  }, [user, loading]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -226,23 +222,11 @@ export default function CreateThread() {
                             <TabsTrigger value="preview">Preview</TabsTrigger>
                         </TabsList>
                         <TabsContent value="write" className="mt-4">
-                            <div className="bg-white text-black rounded-lg overflow-hidden border border-zinc-700">
-                                <ReactQuill 
-                                    theme="snow"
-                                    value={formData.content}
-                                    onChange={(value) => setFormData({...formData, content: value})}
-                                    className="h-[400px] mb-12"
-                                    modules={{
-                                        toolbar: [
-                                            [{ 'header': [1, 2, 3, false] }],
-                                            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                                            [{'list': 'ordered'}, {'list': 'bullet'}],
-                                            ['link', 'image', 'code-block'],
-                                            ['clean']
-                                        ],
-                                    }}
-                                />
-                            </div>
+                            <RichTextEditor
+                                value={formData.content}
+                                onChange={(value) => setFormData({...formData, content: value})}
+                                height="400px"
+                            />
                         </TabsContent>
                         <TabsContent value="preview" className="mt-4">
                             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 min-h-[400px] prose prose-invert max-w-none">
