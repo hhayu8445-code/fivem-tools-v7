@@ -12,6 +12,7 @@ import NProgress from 'nprogress';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 import { logToDiscord } from '@/utils';
 import { useAllStats } from '@/hooks/useStats';
+import MemberBadge from '@/Components/MemberBadge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -465,19 +466,6 @@ export default function Layout({ children }) {
                           {user.username?.[0]?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
-                      {userProfile && (
-                        <img
-                          src={
-                            userProfile.membership_tier === 'admin'
-                              ? 'https://static.vecteezy.com/system/resources/thumbnails/027/291/525/small/3d-rendered-medal-reward-rating-rank-verified-quality-badge-icon-png.png'
-                              : userProfile.membership_tier === 'vip'
-                                ? 'https://static.vecteezy.com/system/resources/thumbnails/011/047/464/small_2x/3d-rendering-of-mvp-badge-game-icon-illustration-for-winner-png.png'
-                                : 'https://static.vecteezy.com/system/resources/thumbnails/011/047/442/small/3d-rendering-of-game-winner-badge-icon-illustration-png.png'
-                          }
-                          className="absolute -bottom-0.5 -right-0.5 w-5 h-5 z-10 drop-shadow-lg"
-                          alt="Badge"
-                        />
-                      )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64 bg-zinc-900 border-zinc-800 text-zinc-200 shadow-xl" align="end">
@@ -492,6 +480,11 @@ export default function Layout({ children }) {
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold text-white truncate">{user.username || 'User'}</div>
                           <div className="text-xs text-zinc-500 truncate">{user.email}</div>
+                          {userProfile && (
+                            <div className="mt-1">
+                              <MemberBadge tier={userProfile.membership_tier} size="sm" />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </DropdownMenuLabel>

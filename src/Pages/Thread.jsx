@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 import LoadingOverlay from '@/Components/LoadingOverlay';
 import LoginRequiredModal from '@/Components/LoginRequiredModal';
+import MemberBadge from '@/Components/MemberBadge';
 import { logToDiscord } from '@/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/Components/ui/dialog';
 import { Label } from '@/Components/ui/label';
@@ -60,20 +61,20 @@ export default function Thread() {
 
         if (!profile) return null;
 
-        const badgeUrl = profile.membership_tier === 'admin'
-            ? 'https://static.vecteezy.com/system/resources/thumbnails/027/291/525/small/3d-rendered-medal-reward-rating-rank-verified-quality-badge-icon-png.png'
-            : profile.membership_tier === 'vip'
-                ? 'https://static.vecteezy.com/system/resources/thumbnails/011/047/464/small_2x/3d-rendering-of-mvp-badge-game-icon-illustration-for-winner-png.png'
-                : 'https://static.vecteezy.com/system/resources/thumbnails/011/047/442/small/3d-rendering-of-game-winner-badge-icon-illustration-png.png';
-
         return (
-            <div className="flex flex-col gap-1 mt-2">
+            <div className="flex flex-col gap-2 mt-2">
                 <div className="flex justify-center">
-                    <img src={badgeUrl} className="w-8 h-8" alt={profile.membership_tier} title={profile.membership_tier.toUpperCase()} />
+                    <MemberBadge tier={profile.membership_tier} size="md" showLabel={true} />
                 </div>
-                <div className="grid grid-cols-2 gap-1 text-[10px] text-zinc-500 mt-2 bg-zinc-950/50 p-2 rounded">
-                    <div>Posts: {profile.posts_count || 0}</div>
-                    <div>Likes: {profile.likes_received_count || 0}</div>
+                <div className="grid grid-cols-2 gap-1 text-[10px] text-zinc-500 mt-1 bg-zinc-950/50 p-2 rounded border border-zinc-800">
+                    <div className="flex items-center gap-1">
+                        <img src="https://img.icons8.com/3d-fluency/94/chat-message.png" className="w-3 h-3" alt="" />
+                        {profile.posts_count || 0}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <img src="https://img.icons8.com/3d-fluency/94/like.png" className="w-3 h-3" alt="" />
+                        {profile.likes_received_count || 0}
+                    </div>
                 </div>
             </div>
         );
