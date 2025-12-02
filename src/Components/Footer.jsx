@@ -6,28 +6,22 @@ export default function Footer() {
     <footer className="border-t border-zinc-800/50 bg-zinc-950/30 backdrop-blur-sm mt-20">
       {/* Sponsor Banners */}
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-4">
-        <div className="rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50">
+        <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
           <img 
-            src="https://media.discordapp.net/attachments/1350474784395235469/1425461397210267678/letra_serverlist_gif.gif" 
+            src="https://cdn.discordapp.com/attachments/1350474784395235469/1425461397210267678/letra_serverlist_gif.gif" 
             alt="Sponsor Banner" 
             className="w-full h-auto"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.parentElement.innerHTML = '<div class="p-8 text-center text-zinc-500"><img src="https://img.icons8.com/3d-fluency/94/advertisement-page.png" class="w-16 h-16 mx-auto mb-2" /><p>Advertisement Space</p></div>';
-            }}
+            loading="lazy"
           />
-        </div>
-        <div className="rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50">
+        </a>
+        <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
           <img 
-            src="https://media.discordapp.net/attachments/1350474784395235469/1410460678896091237/serverlist_iteration_1.gif" 
+            src="https://cdn.discordapp.com/attachments/1350474784395235469/1410460678896091237/serverlist_iteration_1.gif" 
             alt="Sponsor Banner" 
             className="w-full h-auto"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.parentElement.innerHTML = '<div class="p-8 text-center text-zinc-500"><img src="https://img.icons8.com/3d-fluency/94/advertisement-page.png" class="w-16 h-16 mx-auto mb-2" /><p>Advertisement Space</p></div>';
-            }}
+            loading="lazy"
           />
-        </div>
+        </a>
       </div>
       
       <div className="max-w-7xl mx-auto px-6 py-12">
