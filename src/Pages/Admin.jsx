@@ -43,11 +43,20 @@ export default function Admin() {
   });
 
   const createAssetMutation = useMutation({
-    mutationFn: (data) => base44.entities.Asset.create({
-        ...data,
-        tags: data.tags.split(',').map(t => t.trim()),
-        images: [data.thumbnail] // Just using thumb as main image for simplicity
-    }),
+    mutationFn: async (data) => {
+      try {
+        return await base44.entities.Asset.create({
+          ...data,
+          tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+          images: data.thumbnail ? [data.thumbnail] : [],
+          uploaded_by: user?.email || 'admin',
+          uploader_name: user?.username || user?.full_name || 'Admin'
+        });
+      } catch (error) {
+        console.error('Asset creation error:', error);
+        throw error;
+      }
+    },
     onSuccess: () => {
         toast.success('Asset created successfully!');
         logToDiscord('Asset Created (Admin)', {
