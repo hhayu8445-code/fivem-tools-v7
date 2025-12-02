@@ -259,7 +259,7 @@ export default function AssetDetail() {
                         {/* Tech Specs */}
                         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
                             <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-                                <img src="https://img.icons8.com/3d-fluency/94/settings.png" className="w-5 h-5" alt="Specs" /> Technical Details
+                                <img src="https://cdn.iconscout.com/icon/free/png-256/free-apple-settings-icon-svg-download-png-493162.png?f=webp" className="w-5 h-5" alt="Specs" /> Technical Details
                             </h3>
                             <div className="space-y-3">
                                 <div className="flex justify-between text-sm">

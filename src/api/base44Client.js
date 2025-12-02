@@ -168,6 +168,10 @@ export const base44 = {
       localStorage.removeItem('oauth_state');
       
       await base44.auth.ensureProfile(user);
+      
+      // Trigger custom event to notify Layout about auth change
+      window.dispatchEvent(new Event('auth-changed'));
+      
       return user;
     },
     ensureProfile: async (user) => {

@@ -47,7 +47,20 @@ function AppContent() {
   const [user, setUser] = React.useState(null);
 
   React.useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    const fetchUser = () => {
+      base44.auth.me().then(setUser).catch(() => {});
+    };
+    fetchUser();
+
+    // Listen for auth changes
+    const handleAuthChange = () => {
+      fetchUser();
+    };
+    window.addEventListener('auth-changed', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('auth-changed', handleAuthChange);
+    };
   }, []);
 
   useUpdatePresence(user?.email);

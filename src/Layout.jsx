@@ -36,7 +36,7 @@ const navItems = [
 
 const SidebarContent = () => {
   const location = useLocation();
-  
+
   // Real-time stats
   const { data: onlineCount } = useQuery({
     queryKey: ['onlineCount'],
@@ -237,6 +237,20 @@ export default function Layout({ children }) {
     };
     fetchUser();
 
+    // Listen for storage changes (login from another tab or after callback)
+    const handleStorageChange = (e) => {
+      if (e.key === 'discord_user' || e.key === 'discord_token') {
+        fetchUser();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    // Custom event for same-tab login
+    const handleAuthChange = () => {
+      fetchUser();
+    };
+    window.addEventListener('auth-changed', handleAuthChange);
+
     // Heartbeat for online status every 2 minutes
     const interval = setInterval(async () => {
       try {
@@ -252,7 +266,11 @@ export default function Layout({ children }) {
       }
     }, 120000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('auth-changed', handleAuthChange);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -491,10 +509,10 @@ export default function Layout({ children }) {
               </Button>
 
               {/* Discord Link */}
-              <a 
-                href="https://discord.gg/WYR27uKFns" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://discord.gg/WYR27uKFns"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="h-10 w-10 flex items-center justify-center rounded-full text-zinc-400 hover:text-[#5865F2] hover:bg-zinc-800/50 transition-all"
                 title="Join Discord"
               >
@@ -516,13 +534,13 @@ export default function Layout({ children }) {
                         </AvatarFallback>
                       </Avatar>
                       {userProfile && (
-                        <img 
+                        <img
                           src={
-                            userProfile.membership_tier === 'admin' 
+                            userProfile.membership_tier === 'admin'
                               ? 'https://static.vecteezy.com/system/resources/thumbnails/027/291/525/small/3d-rendered-medal-reward-rating-rank-verified-quality-badge-icon-png.png'
                               : userProfile.membership_tier === 'vip'
-                              ? 'https://static.vecteezy.com/system/resources/thumbnails/011/047/464/small_2x/3d-rendering-of-mvp-badge-game-icon-illustration-for-winner-png.png'
-                              : 'https://static.vecteezy.com/system/resources/thumbnails/011/047/442/small/3d-rendering-of-game-winner-badge-icon-illustration-png.png'
+                                ? 'https://static.vecteezy.com/system/resources/thumbnails/011/047/464/small_2x/3d-rendering-of-mvp-badge-game-icon-illustration-for-winner-png.png'
+                                : 'https://static.vecteezy.com/system/resources/thumbnails/011/047/442/small/3d-rendering-of-game-winner-badge-icon-illustration-png.png'
                           }
                           className="absolute -bottom-0.5 -right-0.5 w-5 h-5 z-10 drop-shadow-lg"
                           alt="Badge"
@@ -546,21 +564,21 @@ export default function Layout({ children }) {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-zinc-800" />
-                    
+
                     <DropdownMenuItem asChild className="focus:bg-zinc-800 focus:text-zinc-100 cursor-pointer py-2.5">
                       <Link to="/dashboard" className="flex items-center gap-3 w-full">
                         <img src="https://img.icons8.com/3d-fluency/94/user-male-circle.png" className="w-5 h-5" alt="Dashboard" />
                         <span>Dashboard</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuItem asChild className="focus:bg-zinc-800 focus:text-zinc-100 cursor-pointer py-2.5">
                       <Link to="/dashboard" className="flex items-center gap-3 w-full">
-                        <img src="https://img.icons8.com/3d-fluency/94/settings.png" className="w-5 h-5" alt="Settings" />
+                        <img src="https://cdn.iconscout.com/icon/free/png-256/free-apple-settings-icon-svg-download-png-493162.png?f=webp" className="w-5 h-5" alt="Settings" />
                         <span>Settings</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     {user.id === '1197320834889560127' && (
                       <>
                         <DropdownMenuSeparator className="bg-zinc-800" />
@@ -578,7 +596,7 @@ export default function Layout({ children }) {
                         </DropdownMenuItem>
                       </>
                     )}
-                    
+
                     <DropdownMenuSeparator className="bg-zinc-800" />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-400 focus:text-red-300 focus:bg-red-900/20 cursor-pointer py-2.5">
                       <img src="https://img.icons8.com/3d-fluency/94/shutdown.png" className="mr-3 w-5 h-5" alt="Logout" />
