@@ -1,0 +1,115 @@
+========================================
+  CARA PUSH KE GITHUB - STEP BY STEP
+========================================
+
+OPTION 1: BUAT REPOSITORY BARU (RECOMMENDED)
+============================================
+
+1. Buka browser, pergi ke: https://github.com/new
+
+2. Isi form:
+   - Repository name: fivem-tools-v7
+   - Description: FiveM Tools V7 - Ultimate Resource Hub
+   - Public/Private: Public
+   - JANGAN centang "Initialize this repository with:"
+   
+3. Klik "Create repository"
+
+4. Setelah repository dibuat, jalankan commands ini:
+
+   cd "c:\Users\MUDDING UNDERGROUND\Pictures\runkzerigala\DENGNA"
+   
+   git remote remove origin
+   
+   git remote add origin https://github.com/boostfivem4-oss/fivem-tools-v7.git
+   
+   git push -u origin main
+
+5. Jika diminta login:
+   - Browser akan terbuka otomatis
+   - Login dengan GitHub account Anda
+   - Authorize Git Credential Manager
+   - Kembali ke terminal, push akan otomatis lanjut
+
+
+OPTION 2: GUNAKAN REPOSITORY YANG SUDAH ADA
+============================================
+
+Jika repository sudah ada di: https://github.com/boostfivem4-oss/fivem-tools-v7
+
+Jalankan:
+   cd "c:\Users\MUDDING UNDERGROUND\Pictures\runkzerigala\DENGNA"
+   
+   git remote remove origin
+   
+   git remote add origin https://github.com/boostfivem4-oss/fivem-tools-v7.git
+   
+   git push -u origin main --force
+
+
+OPTION 3: GUNAKAN GITHUB CLI (PALING MUDAH!)
+=============================================
+
+1. Download GitHub CLI: https://cli.github.com/
+
+2. Install
+
+3. Jalankan:
+   cd "c:\Users\MUDDING UNDERGROUND\Pictures\runkzerigala\DENGNA"
+   
+   gh auth login
+   
+   gh repo create fivem-tools-v7 --public --source=. --push
+
+
+========================================
+  SETELAH PUSH BERHASIL
+========================================
+
+1. Buka: https://vercel.com/new
+
+2. Import repository: boostfivem4-oss/fivem-tools-v7
+
+3. Configure:
+   - Framework: Vite
+   - Build Command: npm run build
+   - Output Directory: dist
+
+4. Add Environment Variables:
+   VITE_API_KEY=your_base44_api_key
+   VITE_APP_ID=your_base44_app_id
+   VITE_DISCORD_CLIENT_ID=your_discord_client_id
+   VITE_DISCORD_CLIENT_SECRET=your_discord_client_secret
+   VITE_DISCORD_REDIRECT_URI=https://your-domain.vercel.app/auth/callback
+   VITE_DISCORD_WEBHOOK_URL=your_discord_webhook_url
+
+5. Klik "Deploy"
+
+6. Tunggu deploy selesai (2-3 menit)
+
+7. DONE! 🎉
+
+
+========================================
+  STATUS SAAT INI
+========================================
+
+✅ Code cleanup: COMPLETE
+✅ Build test: SUCCESS
+✅ Git commit: DONE
+✅ Ready to push: YES
+
+Tinggal:
+⏳ Create GitHub repository
+⏳ Push to GitHub
+⏳ Deploy to Vercel
+
+
+========================================
+  BUTUH BANTUAN?
+========================================
+
+Discord: https://discord.gg/WYR27uKFns
+
+Atau gunakan script otomatis:
+   deploy-all.bat
