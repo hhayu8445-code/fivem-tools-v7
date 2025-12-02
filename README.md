@@ -1,9 +1,20 @@
 # 🎮 FiveM Tools V7 - Ultimate Resource Hub
 
+[![Version](https://img.shields.io/badge/version-7.3.0-blue.svg)](https://github.com/boostfivem4-oss/fivem-tools-v7)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/boostfivem4-oss/fivem-tools-v7)
+[![License](https://img.shields.io/badge/license-Private-red.svg)](https://github.com/boostfivem4-oss/fivem-tools-v7)
+[![Discord](https://img.shields.io/discord/YOUR_DISCORD_ID?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/WYR27uKFns)
+
 Premium platform untuk FiveM scripts, vehicles, MLOs, dan community forum.
 
 ## 🌐 Live Demo
-**https://fivemtools.net**
+**[https://fivemtools.net](https://fivemtools.net)**
+
+## 📸 Screenshots
+
+<div align="center">
+  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692c9d27fcb03e0d2d610054/fd2e0dbc0_Untitleddesign-26.png" alt="FiveM Tools V7" width="200"/>
+</div>
 
 ## ✨ Features
 
