@@ -588,6 +588,12 @@ export default function Layout({ children }) {
                             <span className="font-medium">Admin Panel</span>
                           </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="focus:bg-violet-900/20 focus:text-violet-400 cursor-pointer py-2.5">
+                          <Link to="/admin/vouches" className="flex items-center gap-3 w-full">
+                            <img src="https://img.icons8.com/3d-fluency/94/verified-badge.png" className="w-5 h-5" alt="Vouches" />
+                            <span className="font-medium">Vouch Management</span>
+                          </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem asChild className="focus:bg-blue-900/20 focus:text-blue-400 cursor-pointer py-2.5">
                           <Link to="/mod" className="flex items-center gap-3 w-full">
                             <img src="https://img.icons8.com/3d-fluency/94/law.png" className="w-5 h-5" alt="Mod" />

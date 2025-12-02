@@ -1,7 +1,11 @@
 // WARNING: In production, move these to environment variables
 // Use import.meta.env.VITE_API_KEY and import.meta.env.VITE_APP_ID
-const API_KEY = import.meta.env.VITE_API_KEY || '0331b989b68d4f18b88add514f4e6803';
-const APP_ID = import.meta.env.VITE_APP_ID || '692c9d27fcb03e0d2d610054';
+const API_KEY = import.meta.env.VITE_API_KEY;
+const APP_ID = import.meta.env.VITE_APP_ID;
+
+if (!API_KEY || !APP_ID) {
+  console.error('Missing required environment variables: VITE_API_KEY or VITE_APP_ID');
+}
 const BASE_URL = `https://app.base44.com/api/apps/${APP_ID}/entities`;
 
 if (!import.meta.env.VITE_API_KEY) {

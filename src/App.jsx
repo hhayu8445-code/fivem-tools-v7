@@ -25,6 +25,7 @@ import CreateThread from './Pages/CreateThread';
 import ForumSearch from './Pages/ForumSearch';
 import Admin from './Pages/Admin';
 import ModDashboard from './Pages/ModDashboard';
+import VouchAdmin from './Pages/VouchAdmin';
 import NotFound from './Pages/NotFound';
 import Terms from './Pages/Terms';
 import Privacy from './Pages/Privacy';
@@ -85,6 +86,7 @@ function AppContent() {
               <Route path="/community/search" element={<ProtectedRoute><ForumSearch /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
+              <Route path="/admin/vouches" element={<ProtectedRoute requireAdmin={true}><VouchAdmin /></ProtectedRoute>} />
               <Route path="/mod" element={<ProtectedRoute requireMod={true}><ModDashboard /></ProtectedRoute>} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />

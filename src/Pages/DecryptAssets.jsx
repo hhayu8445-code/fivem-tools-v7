@@ -27,12 +27,10 @@ export default function DecryptAssets() {
           const currentUser = await base44.auth.me();
           setUser(currentUser);
 
-          // Check if user has vouch
-          const vouches = await base44.entities.VouchMessage.list({
-            query: { discord_user_id: currentUser.id, verified: true },
-            limit: 1
-          });
-          setHasVouch(vouches.length > 0);
+          // Check if user has vouch (local storage)
+          const { getVouchByUserId } = await import('@/utils/vouchStorage');
+          const vouch = getVouchByUserId(currentUser.id);
+          setHasVouch(!!vouch);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -73,16 +71,13 @@ export default function DecryptAssets() {
 
     setIsCheckingVouch(true);
     try {
-      const { base44 } = await import('@/api/base44Client');
+      const { getVouchByMessageId, getVouchByUserId, addVouch } = await import('@/utils/vouchStorage');
 
       // Check if vouch already exists
-      const existingVouch = await base44.entities.VouchMessage.list({
-        query: { message_id: messageId },
-        limit: 1
-      });
+      const existingVouch = getVouchByMessageId(messageId);
 
-      if (existingVouch.length > 0) {
-        if (existingVouch[0].discord_user_id !== user.id) {
+      if (existingVouch) {
+        if (existingVouch.discord_user_id !== user.id) {
           setStatus({ type: 'error', message: 'This vouch belongs to another user' });
           return false;
         }
@@ -92,14 +87,13 @@ export default function DecryptAssets() {
       }
 
       // Save new vouch
-      await base44.entities.VouchMessage.create({
+      addVouch({
         discord_user_id: user.id,
         discord_username: user.username,
         channel_id: channelId,
         message_id: messageId,
         message_link: vouchLink,
-        vouch_text: 'Vouch message from Discord',
-        verified: true
+        vouch_text: 'Review from Discord trusted-reviews channel'
       });
 
       setHasVouch(true);
