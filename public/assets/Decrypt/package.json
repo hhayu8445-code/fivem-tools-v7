@@ -1,0 +1,41 @@
+{
+    "name": "fivecfx-decrypt-bot",
+    "version": "1.0.0",
+    "description": "FiveCFX Decrypt Bot - A powerful FiveM resource decryption bot for Discord with web interface",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "fivem",
+        "decrypt",
+        "discord",
+        "bot",
+        "fivecfx"
+    ],
+    "author": "FiveCFX (https://fivecfx.com)",
+    "license": "ISC",
+    "homepage": "https://fivecfx.com",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fivecfx/decrypt-bot"
+    },
+    "bugs": {
+        "url": "https://discord.fivecfx.com"
+    },
+    "dependencies": {
+        "adm-zip": "^0.5.16",
+        "archiver": "^7.0.1",
+        "axios": "^1.9.0",
+        "chacha20": "^0.1.4",
+        "discord.js": "^14.14.1",
+        "express": "^5.1.0",
+        "https-proxy-agent": "^7.0.6",
+        "multer": "^2.0.2",
+        "uuid": "^9.0.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

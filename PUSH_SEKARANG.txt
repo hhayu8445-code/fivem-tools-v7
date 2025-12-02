@@ -1,0 +1,192 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║           PUSH KE GITHUB - 3 LANGKAH MUDAH                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+✅ Git sudah ready: 135 files, 27,351 lines committed!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LANGKAH 1: BUAT REPOSITORY DI GITHUB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Buka browser, go to:
+   👉 https://github.com/new
+
+2. Isi form:
+   Repository name:  fivem-tools-v7
+   Description:      FiveM Tools V7 - Ultimate Resource Hub
+   Visibility:       ✅ Public (atau Private)
+   
+   ⚠️ JANGAN centang:
+   - Add a README file
+   - Add .gitignore
+   - Choose a license
+
+3. Click: "Create repository"
+
+4. COPY URL yang muncul, contoh:
+   https://github.com/boostfivem4-oss/fivem-tools-v7.git
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LANGKAH 2: PUSH CODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Buka Command Prompt atau PowerShell, lalu run:
+
+cd "c:\Users\MUDDING UNDERGROUND\Pictures\runkzerigala\DENGNA"
+
+git remote add origin https://github.com/boostfivem4-oss/fivem-tools-v7.git
+
+git push -u origin main
+
+⚠️ Ganti URL dengan URL repo Anda dari Langkah 1!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LANGKAH 3: VERIFY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Refresh halaman GitHub repo
+2. Harus muncul 135 files
+3. README.md harus terlihat
+
+✅ DONE! Lanjut ke Vercel!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JIKA ERROR "AUTHENTICATION FAILED":
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Option A: GitHub CLI (PALING MUDAH)
+────────────────────────────────────
+1. Download: https://cli.github.com/
+2. Install
+3. Run:
+   gh auth login
+   (pilih: GitHub.com → HTTPS → Login with browser)
+4. Setelah login, run:
+   cd "c:\Users\MUDDING UNDERGROUND\Pictures\runkzerigala\DENGNA"
+   gh repo create fivem-tools-v7 --public --source=. --push
+
+Option B: Personal Access Token
+────────────────────────────────────
+1. Go to: https://github.com/settings/tokens
+2. Click: "Generate new token (classic)"
+3. Select: repo, workflow
+4. Copy token
+5. Saat push, masukkan:
+   Username: your-github-username
+   Password: ghp_xxxxxxxxxxxxx (token Anda)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SETELAH PUSH BERHASIL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEXT: DEPLOY TO VERCEL
+────────────────────────────────────
+
+1. Go to: https://vercel.com/new
+
+2. Click: "Import Git Repository"
+
+3. Select: boostfivem4-oss/fivem-tools-v7
+
+4. Configure:
+   Framework Preset:  Vite
+   Build Command:     npm run build
+   Output Directory:  dist
+
+5. Add Environment Variables:
+   (Copy dari file .env.production)
+
+   VITE_API_KEY=0331b989b68d4f18b88add514f4e6803
+   VITE_APP_ID=692c9d27fcb03e0d2d610054
+   VITE_DISCORD_CLIENT_ID=1442938080473645107
+   VITE_DISCORD_CLIENT_SECRET=QTx5ec8Zo2mhRjAfs1Wbuca6a30XeyrB
+   VITE_DISCORD_REDIRECT_URI=https://fivemtools.net/auth/callback
+   VITE_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/1445328264615952496/2amowz5IfdHXgn6tq-nt-D8sQj30GQiIWaV2yVQgvP-Pl4TbR3WZEKvMX39E1w6_sIzu
+
+6. Click: "Deploy"
+
+7. Wait 2-3 minutes
+
+8. ✅ DONE! Site deployed!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SETUP DNS DI CPANEL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ PENTING: Hapus CNAME www lama dulu!
+
+1. Login cPanel
+2. Domains → Zone Editor → fivemtools.net
+3. HAPUS CNAME www yang lama (ini yang error!)
+4. Add A Record:
+   Type:  A
+   Name:  @
+   Value: 76.76.21.21
+5. Add CNAME Record:
+   Type:  CNAME
+   Name:  www
+   Value: cname.vercel-dns.com
+6. Save
+
+Lihat: FIX_CNAME_ERROR.md untuk detail!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ADD DOMAIN DI VERCEL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Vercel Dashboard → Your Project
+2. Settings → Domains
+3. Add: fivemtools.net
+4. Vercel will verify DNS
+5. Wait 5-30 minutes
+6. ✅ DONE!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST SITE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ https://fivemtools.net
+✅ https://www.fivemtools.net
+✅ Discord login works
+✅ All features working
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK REFERENCE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Files:
+  📖 GITHUB_SETUP.md       - Full GitHub guide
+  📖 FIX_CNAME_ERROR.md    - Fix DNS error
+  📖 CPANEL_DNS_SETUP.md   - DNS setup guide
+  📖 START_HERE.md         - Quick start
+  📖 DEPLOYMENT_SUMMARY.md - Complete overview
+
+Commands:
+  git status               - Check status
+  git remote -v            - Check remote
+  git push -u origin main  - Push to GitHub
+
+Support:
+  💬 Discord: https://discord.gg/WYR27uKFns
+  📧 Vercel: https://vercel.com/support
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║              MULAI DARI LANGKAH 1! 🚀                       ║
+║                                                              ║
+║         Buka: https://github.com/new                        ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
