@@ -127,7 +127,7 @@ export default function ModDashboard() {
                 type: 'mod',
                 user: user.full_name || user.username,
                 email: user.email,
-                description: `🚫 User ${isBanned ? 'banned' : 'unbanned'}: ${email}`,
+                description: `User ${isBanned ? 'banned' : 'unbanned'}: ${email}`,
                 extra: { 'Target User': email }
             });
         },

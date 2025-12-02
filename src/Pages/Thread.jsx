@@ -268,7 +268,7 @@ export default function Thread() {
                     type: 'vote',
                     user: user.full_name || user.username,
                     email: user.email,
-                    description: `${direction === 1 ? '⬆️ Upvote' : '⬇️ Downvote'} on ${targetType}`,
+                    description: `${direction === 1 ? 'Upvote' : 'Downvote'} on ${targetType}`,
                     extra: { 'Target Type': targetType, 'Target ID': targetId }
                 });
             },
