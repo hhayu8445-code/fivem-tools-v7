@@ -595,6 +595,12 @@ export default function Layout({ children }) {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild className="focus:bg-blue-900/20 focus:text-blue-400 cursor-pointer py-2.5">
+                          <Link to="/admin/assets" className="flex items-center gap-3 w-full">
+                            <img src="https://img.icons8.com/3d-fluency/94/box.png" className="w-5 h-5" alt="Assets" />
+                            <span className="font-medium">Asset Management</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="focus:bg-blue-900/20 focus:text-blue-400 cursor-pointer py-2.5">
                           <Link to="/mod" className="flex items-center gap-3 w-full">
                             <img src="https://img.icons8.com/3d-fluency/94/law.png" className="w-5 h-5" alt="Mod" />
                             <span className="font-medium">Mod Panel</span>
