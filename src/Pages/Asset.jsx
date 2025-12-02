@@ -88,6 +88,23 @@ export default function AssetDetail() {
         }
     });
 
+    React.useEffect(() => {
+        let interval;
+        if (showDownload && downloadTimer > 0) {
+            interval = setInterval(() => {
+                setDownloadTimer((prev) => {
+                    if (prev <= 1) {
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [showDownload, downloadTimer]);
+
     const handleDownload = () => {
         if (!user) {
             setShowLoginModal(true);
@@ -102,21 +119,10 @@ export default function AssetDetail() {
         }
 
         if (isVip) {
-            // Direct download for VIP
             startDownload();
         } else {
-            // Timer for free users
             setShowDownload(true);
             setDownloadTimer(15);
-            const interval = setInterval(() => {
-                setDownloadTimer((prev) => {
-                    if (prev <= 1) {
-                        clearInterval(interval);
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
         }
     };
 

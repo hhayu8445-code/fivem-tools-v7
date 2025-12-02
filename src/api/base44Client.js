@@ -185,8 +185,8 @@ export const base44 = {
       });
       
       // Check if user is admin by Discord ID
-      const ADMIN_DISCORD_IDS = ['1197320834889560127'];
-      const isAdminUser = ADMIN_DISCORD_IDS.includes(user.id);
+      const { ADMIN_CONFIG } = await import('@/config/admin');
+      const isAdminUser = ADMIN_CONFIG.isAdmin(user.id);
       
       if (profiles.length === 0) {
         await base44.entities.UserProfile.create({

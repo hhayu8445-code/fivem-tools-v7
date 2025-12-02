@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ADMIN_CONFIG } from '@/config/admin';
 
 export default function AssetManagement() {
   const [user, setUser] = useState(null);
@@ -24,7 +25,7 @@ export default function AssetManagement() {
       try {
         if (await base44.auth.isAuthenticated()) {
           const currentUser = await base44.auth.me();
-          if (currentUser.id !== '1197320834889560127') {
+          if (!ADMIN_CONFIG.isAdmin(currentUser.id)) {
             window.location.href = '/';
             return;
           }
@@ -39,10 +40,15 @@ export default function AssetManagement() {
     checkAuth();
   }, []);
 
-  const { data: assets = [], isLoading } = useQuery({
+  const { data: assets = [], isLoading, error } = useQuery({
     queryKey: ['assets-admin'],
     queryFn: () => base44.entities.Asset.list({ limit: 1000, sort: { created_date: -1 } }),
-    enabled: !!user
+    enabled: !!user,
+    retry: 2,
+    onError: (err) => {
+      toast.error('Failed to load assets. Please refresh the page.');
+      console.error('Asset load error:', err);
+    }
   });
 
   const updateMutation = useMutation({
@@ -202,7 +208,14 @@ export default function AssetManagement() {
           <CardTitle className="text-white">Assets ({filteredAssets.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {error ? (
+            <div className="text-center py-12">
+              <div className="text-red-400 mb-4">Failed to load assets</div>
+              <Button onClick={() => window.location.reload()} className="bg-fuchsia-600 hover:bg-fuchsia-700">
+                Retry
+              </Button>
+            </div>
+          ) : isLoading ? (
             <div className="text-center py-12">
               <div className="w-8 h-8 mx-auto border-4 border-fuchsia-500 border-t-transparent rounded-full animate-spin" />
             </div>

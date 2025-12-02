@@ -1,6 +1,6 @@
 // Local Vouch Storage System - No Base44 Required
 const VOUCH_STORAGE_KEY = 'fivem_vouches';
-const ADMIN_DISCORD_IDS = ['1197320834889560127']; // Admin Discord IDs
+import { ADMIN_CONFIG } from '@/config/admin';
 
 // Get all vouches
 export const getAllVouches = () => {
@@ -65,7 +65,7 @@ export const deleteVouch = (id) => {
 
 // Check if user is admin
 export const isAdmin = (userId) => {
-  return ADMIN_DISCORD_IDS.includes(userId);
+  return ADMIN_CONFIG.isAdmin(userId);
 };
 
 // Get stats

@@ -579,7 +579,14 @@ export default function Layout({ children }) {
                       </Link>
                     </DropdownMenuItem>
 
-                    {user.id === '1197320834889560127' && (
+                    {(() => {
+                      try {
+                        const { ADMIN_CONFIG } = require('@/config/admin');
+                        return ADMIN_CONFIG.isAdmin(user.id);
+                      } catch {
+                        return user.id === '1197320834889560127';
+                      }
+                    })() && (
                       <>
                         <DropdownMenuSeparator className="bg-zinc-800" />
                         <DropdownMenuItem asChild className="focus:bg-amber-900/20 focus:text-amber-400 cursor-pointer py-2.5">
