@@ -214,6 +214,7 @@ export const base44 = {
     DirectMessage: createEntityHandler('DirectMessage'),
     DownloadLog: createEntityHandler('DownloadLog'),
     ForumLike: createEntityHandler('ForumLike'),
-    ForumReport: createEntityHandler('ForumReport')
+    ForumReport: createEntityHandler('ForumReport'),
+    VouchMessage: createEntityHandler('VouchMessage')
   }
 };

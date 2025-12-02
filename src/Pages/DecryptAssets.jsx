@@ -12,9 +12,12 @@ export default function DecryptAssets() {
   const [isChecking, setIsChecking] = useState(false);
   const [file, setFile] = useState(null);
   const [cfxKey, setCfxKey] = useState('');
+  const [vouchLink, setVouchLink] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [user, setUser] = React.useState(null);
+  const [hasVouch, setHasVouch] = React.useState(false);
+  const [isCheckingVouch, setIsCheckingVouch] = React.useState(false);
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -23,6 +26,13 @@ export default function DecryptAssets() {
         if (await base44.auth.isAuthenticated()) {
           const currentUser = await base44.auth.me();
           setUser(currentUser);
+
+          // Check if user has vouch
+          const vouches = await base44.entities.VouchMessage.list({
+            query: { discord_user_id: currentUser.id, verified: true },
+            limit: 1
+          });
+          setHasVouch(vouches.length > 0);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -30,6 +40,79 @@ export default function DecryptAssets() {
     };
     fetchUser();
   }, []);
+
+  const validateVouchLink = async () => {
+    if (!vouchLink.trim()) {
+      setStatus({ type: 'error', message: 'Please enter vouch message link' });
+      return false;
+    }
+
+    // Validate Discord message link format
+    const discordLinkRegex = /discord\.com\/channels\/(\d+)\/(\d+)\/(\d+)/;
+    const match = vouchLink.match(discordLinkRegex);
+
+    if (!match) {
+      setStatus({ type: 'error', message: 'Invalid Discord message link format' });
+      return false;
+    }
+
+    const [, guildId, channelId, messageId] = match;
+
+    // Validate channel ID (must be from your Discord server)
+    const VALID_CHANNEL_IDS = [
+      '1445328264615952493', // Replace with your actual vouch channel ID
+      '1404452656906375210'  // Add more channel IDs if needed
+    ];
+
+    if (!VALID_CHANNEL_IDS.includes(channelId)) {
+      setStatus({
+        type: 'error',
+        message: 'Vouch must be from the official vouch channel. Join our Discord and post in #vouch channel.'
+      });
+      return false;
+    }
+
+    setIsCheckingVouch(true);
+    try {
+      const { base44 } = await import('@/api/base44Client');
+
+      // Check if vouch already exists
+      const existingVouch = await base44.entities.VouchMessage.list({
+        query: { message_id: messageId },
+        limit: 1
+      });
+
+      if (existingVouch.length > 0) {
+        if (existingVouch[0].discord_user_id !== user.id) {
+          setStatus({ type: 'error', message: 'This vouch belongs to another user' });
+          return false;
+        }
+        setHasVouch(true);
+        setStatus({ type: 'success', message: 'Vouch verified successfully!' });
+        return true;
+      }
+
+      // Save new vouch
+      await base44.entities.VouchMessage.create({
+        discord_user_id: user.id,
+        discord_username: user.username,
+        channel_id: channelId,
+        message_id: messageId,
+        message_link: vouchLink,
+        vouch_text: 'Vouch message from Discord',
+        verified: true
+      });
+
+      setHasVouch(true);
+      setStatus({ type: 'success', message: 'Vouch verified successfully!' });
+      return true;
+    } catch (error) {
+      setStatus({ type: 'error', message: 'Failed to verify vouch. Please try again.' });
+      return false;
+    } finally {
+      setIsCheckingVouch(false);
+    }
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -45,6 +128,10 @@ export default function DecryptAssets() {
   };
 
   const handleUploadDecrypt = async () => {
+    if (!hasVouch) {
+      setStatus({ type: 'error', message: 'Please verify your vouch message first' });
+      return;
+    }
     if (!file) {
       setStatus({ type: 'error', message: 'Please select a file' });
       return;
@@ -207,54 +294,181 @@ export default function DecryptAssets() {
                 Upload your encrypted FiveM resource
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-white font-semibold">Discord Connection</h3>
-                  <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-lg transition-colors">
-                    <img src="https://cdn-icons-png.flaticon.com/512/14857/14857399.png" className="w-4 h-4" alt="Discord" />
-                    Join Discord
-                  </a>
+            <CardContent className="space-y-6">
+              {/* Vouch Verification Section */}
+              <div className="bg-gradient-to-br from-zinc-950 to-zinc-900 border-2 border-zinc-800 rounded-xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#5865F2]/20 flex items-center justify-center">
+                      <img src="https://cdn-icons-png.flaticon.com/512/14857/14857399.png" className="w-6 h-6" alt="Discord" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold">Discord Vouch Required</h3>
+                      <p className="text-xs text-zinc-500">Step 1: Verify your vouch message</p>
+                    </div>
+                  </div>
+                  {hasVouch && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg">
+                      <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="20,6 9,17 4,12" />
+                      </svg>
+                      <span className="text-sm font-semibold text-green-400">Verified</span>
+                    </div>
+                  )}
                 </div>
-                <p className="text-sm text-zinc-400">You must have a vouch message in our Discord server to use this service</p>
+
+                {!hasVouch ? (
+                  <>
+                    <div className="bg-zinc-950/50 border border-zinc-800 rounded-lg p-4 space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-fuchsia-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-xs font-bold text-fuchsia-400">1</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-zinc-300 font-medium">Join our Discord server</p>
+                          <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-lg transition-colors font-medium">
+                            <img src="https://cdn-icons-png.flaticon.com/512/14857/14857399.png" className="w-4 h-4" alt="Discord" />
+                            Join Discord Server
+                          </a>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-fuchsia-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-xs font-bold text-fuchsia-400">2</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-zinc-300 font-medium">Post a vouch message in #vouch channel</p>
+                          <p className="text-xs text-zinc-500 mt-1">Example: "Great service! Fast decrypt and secure."</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-fuchsia-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-xs font-bold text-fuchsia-400">3</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-zinc-300 font-medium">Copy the message link and paste below</p>
+                          <p className="text-xs text-zinc-500 mt-1">Right-click message → Copy Message Link</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-zinc-300">
+                        Vouch Message Link <span className="text-red-400">*</span>
+                      </label>
+                      <Input
+                        type="text"
+                        placeholder="https://discord.com/channels/SERVER_ID/CHANNEL_ID/MESSAGE_ID"
+                        className="bg-zinc-950 border-zinc-700 text-zinc-300 h-12 font-mono text-sm"
+                        value={vouchLink}
+                        onChange={(e) => setVouchLink(e.target.value)}
+                      />
+                      <p className="text-xs text-zinc-500">Paste your Discord vouch message link here</p>
+                    </div>
+
+                    <Button
+                      onClick={validateVouchLink}
+                      disabled={isCheckingVouch || !vouchLink.trim()}
+                      className="w-full bg-gradient-to-r from-[#5865F2] to-[#4752C4] hover:from-[#4752C4] hover:to-[#3c45a5] text-white h-12 font-semibold"
+                    >
+                      {isCheckingVouch ? (
+                        <>
+                          <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Verifying Vouch...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="20,6 9,17 4,12" />
+                          </svg>
+                          Verify Vouch
+                        </>
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <svg className="w-6 h-6 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22,4 12,14.01 9,11.01" />
+                      </svg>
+                      <div>
+                        <p className="text-sm font-semibold text-green-400">Vouch Verified!</p>
+                        <p className="text-xs text-green-400/70">You can now decrypt your assets</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">CFX License Key <span className="text-zinc-500">(Optional)</span></label>
+              {/* CFX License Key */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-zinc-300">CFX License Key <span className="text-zinc-500">(Optional)</span></label>
                 <Input
                   type="text"
                   placeholder="Enter your CFX license key (optional)..."
-                  className="bg-zinc-950 border-zinc-800 text-zinc-300"
+                  className="bg-zinc-950 border-zinc-700 text-zinc-300 h-12"
                   value={cfxKey}
                   onChange={(e) => setCfxKey(e.target.value)}
                 />
+                <p className="text-xs text-zinc-500">Optional: Provide your CFX license key for better compatibility</p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Upload File (.zip or .fxap) <span className="text-red-400">*</span></label>
+              {/* File Upload */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-zinc-300">Upload File (.zip or .fxap) <span className="text-red-400">*</span></label>
                 <Input
                   type="file"
                   accept=".zip,.fxap"
                   onChange={handleFileChange}
-                  className="bg-zinc-950 border-zinc-800 text-zinc-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-fuchsia-600 file:text-white file:cursor-pointer hover:file:bg-fuchsia-700"
+                  className="bg-zinc-950 border-zinc-700 text-zinc-300 h-12 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-fuchsia-600 file:text-white file:cursor-pointer hover:file:bg-fuchsia-700 file:font-medium"
                 />
                 {file && (
-                  <p className="text-sm text-zinc-400 mt-2">Selected: {file.name}</p>
+                  <div className="flex items-center gap-2 p-3 bg-zinc-950/50 border border-zinc-800 rounded-lg">
+                    <svg className="w-5 h-5 text-fuchsia-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                      <polyline points="13,2 13,9 20,9" />
+                    </svg>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-zinc-300 truncate">{file.name}</p>
+                      <p className="text-xs text-zinc-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 space-y-3">
-                <h3 className="text-white font-semibold flex items-center gap-2">
+              {/* Terms & Conditions */}
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 space-y-4">
+                <h3 className="text-white font-bold flex items-center gap-2">
                   <img src="https://img.icons8.com/3d-fluency/94/info.png" className="w-5 h-5" alt="Info" />
                   Terms & Conditions
                 </h3>
-                <ul className="text-sm text-zinc-400 space-y-2 list-disc list-inside">
-                  <li>Maximum file size: 100MB</li>
-                  <li>Only .zip and .fxap formats supported</li>
-                  <li>You must have a vouch message in our Discord server</li>
-                  <li>Files will be automatically deleted after download</li>
-                  <li>Decryption process takes 1-5 minutes</li>
-                  <li>You are responsible for the files you upload</li>
+                <ul className="text-sm text-zinc-400 space-y-2.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-fuchsia-400 mt-0.5">•</span>
+                    <span>Maximum file size: 100MB</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-fuchsia-400 mt-0.5">•</span>
+                    <span>Only .zip and .fxap formats supported</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-fuchsia-400 mt-0.5">•</span>
+                    <span>Verified vouch message required</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-fuchsia-400 mt-0.5">•</span>
+                    <span>Files automatically deleted after download</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-fuchsia-400 mt-0.5">•</span>
+                    <span>Decryption process takes 1-5 minutes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-fuchsia-400 mt-0.5">•</span>
+                    <span>You are responsible for uploaded files</span>
+                  </li>
                 </ul>
                 <div className="flex items-start gap-3 pt-2">
                   <Checkbox
@@ -269,10 +483,11 @@ export default function DecryptAssets() {
                 </div>
               </div>
 
+              {/* Decrypt Button */}
               <Button
                 onClick={handleUploadDecrypt}
-                disabled={!file || !agreed || isUploading}
-                className="w-full bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-700 hover:to-violet-700 text-white h-14 text-lg font-semibold shadow-lg shadow-fuchsia-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!hasVouch || !file || !agreed || isUploading}
+                className="w-full bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-700 hover:to-violet-700 text-white h-14 text-lg font-bold shadow-lg shadow-fuchsia-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isUploading ? (
                   <>
