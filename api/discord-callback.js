@@ -6,13 +6,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { code, codeVerifier } = req.body;
+  const { code } = req.body;
 
-  console.log('[AUTH] Starting OAuth callback. Code present:', !!code, 'Verifier present:', !!codeVerifier);
+  console.log('[AUTH] Starting OAuth callback. Code present:', !!code);
 
-  if (!code || !codeVerifier) {
-    console.error('[AUTH] Missing required parameters. Code:', !!code, 'Verifier:', !!codeVerifier);
-    return res.status(400).json({ error: 'Missing code or codeVerifier' });
+  if (!code) {
+    console.error('[AUTH] Missing required parameters. Code:', !!code);
+    return res.status(400).json({ error: 'Missing code' });
   }
 
   // ✅ Try multiple environment variable sources for flexibility
@@ -56,8 +56,7 @@ export default async function handler(req, res) {
       client_secret: DISCORD_CLIENT_SECRET,
       code: code,
       grant_type: 'authorization_code',
-      redirect_uri: DISCORD_REDIRECT_URI,
-      code_verifier: codeVerifier
+      redirect_uri: DISCORD_REDIRECT_URI
     });
 
     console.log('[AUTH] Token request to Discord API...');
