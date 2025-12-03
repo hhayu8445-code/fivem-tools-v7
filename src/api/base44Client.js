@@ -141,95 +141,84 @@ export const base44 = {
       const savedState = localStorage.getItem('oauth_state');
       if (state !== savedState) throw new Error('Invalid state');
       
-      // ✅ FIXED: Implement fallback OAuth flow for frontend-only apps
-      // Note: In production with backend, use secure OAuth endpoint
+      // ✅ FIXED: 100% REALISTIC Discord OAuth flow - FULL DISCORD ACCOUNT ONLY
+      // No anonymous/fallback users - all authentication must be from real Discord accounts
       let tokens = null;
-      let userEmail = null;
       
-      // Try to fetch user data with the authorization code
-      // For SPAs without backend, use implicit flow with public client
+      // Get PKCE code verifier for secure token exchange
+      const codeVerifier = localStorage.getItem('pkce_code_verifier');
+      if (!codeVerifier) {
+        throw new Error('Invalid PKCE session. Please login again.');
+      }
+      
+      // Exchange authorization code for access token via Discord OAuth
       try {
-        // Attempt to get user info directly (some OAuth providers support this)
-        const codeVerifier = localStorage.getItem('pkce_code_verifier');
-        if (!codeVerifier) {
-          // Fallback: Create dummy token object for offline users
-          // In production, implement proper backend OAuth exchange
-          tokens = {
-            access_token: `code_${code}`,
-            token_type: 'Bearer',
-            expires_in: 604800
-          };
-          userEmail = null; // Will be fetched from user profile
-        } else {
-          // PKCE flow if available
-          const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-              client_id: DISCORD_CLIENT_ID,
-              code: code,
-              grant_type: 'authorization_code',
-              redirect_uri: DISCORD_REDIRECT_URI,
-              code_verifier: codeVerifier
-            })
-          });
-          
-          if (tokenResponse.ok) {
-            tokens = await tokenResponse.json();
-          }
+        const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: DISCORD_CLIENT_ID,
+            code: code,
+            grant_type: 'authorization_code',
+            redirect_uri: DISCORD_REDIRECT_URI,
+            code_verifier: codeVerifier
+          })
+        });
+        
+        if (!tokenResponse.ok) {
+          const errorData = await tokenResponse.text();
+          throw new Error(`Discord token exchange failed: ${tokenResponse.status}`);
+        }
+        
+        tokens = await tokenResponse.json();
+        if (!tokens.access_token) {
+          throw new Error('No access token received from Discord');
         }
       } catch (err) {
-        console.warn('OAuth token exchange failed:', err);
-        // Create minimal token for offline support
-        tokens = {
-          access_token: `code_${code}`,
-          token_type: 'Bearer'
-        };
+        console.error('Discord OAuth token exchange error:', err);
+        throw new Error('Failed to authenticate with Discord. Please try again.');
       }
       
-      if (!tokens) {
-        throw new Error('Failed to exchange authorization code for token');
-      }
-      
-      // Fetch Discord user data
+      // Fetch Discord user data - REAL DISCORD ACCOUNT REQUIRED
       let discordUser = null;
       try {
         const userResponse = await fetch('https://discord.com/api/users/@me', {
           headers: { Authorization: `Bearer ${tokens.access_token}` }
         });
         
-        if (userResponse.ok) {
-          discordUser = await userResponse.json();
-        } else {
-          // Fallback: Create anonymous user if API fails
-          console.warn('Discord API fetch failed, creating anonymous user');
-          discordUser = {
-            id: `anon_${Date.now()}`,
-            username: 'Anonymous User',
-            discriminator: '0000',
-            global_name: 'Anonymous'
-          };
+        // ✅ 100% REALISTIC: Require real Discord user data - NO ANONYMOUS FALLBACK
+        if (!userResponse.ok) {
+          const errorData = await userResponse.text();
+          throw new Error(`Failed to fetch Discord user: ${userResponse.status}`);
+        }
+        
+        discordUser = await userResponse.json();
+        if (!discordUser.id) {
+          throw new Error('Invalid Discord user data received');
         }
       } catch (err) {
-        console.error('Failed to fetch Discord user:', err);
-        throw new Error('Failed to fetch user data from Discord');
+        console.error('Discord user fetch error:', err);
+        throw new Error('Failed to fetch user data from Discord. Invalid credentials.');
       }
       
-      // Build user object
+      // Build user object from REAL Discord data only - no fallbacks
       const user = {
-        id: discordUser.id || `user_${code.substring(0, 16)}`,
-        email: discordUser.email || `user_${discordUser.id}@fivem-tools.local`,
-        username: discordUser.username || 'Anonymous',
-        discriminator: discordUser.discriminator || '0000',
+        id: discordUser.id,
+        email: discordUser.email || `user_${discordUser.id}@discord.local`,
+        username: discordUser.username,
+        discriminator: discordUser.discriminator,
         avatar: discordUser.avatar 
           ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-          : `https://api.dicebear.com/7.x/avataaars/svg?seed=${discordUser.id || code}`,
-        global_name: discordUser.global_name || discordUser.username || 'User'
+          : `https://cdn.discordapp.com/embed/avatars/${(parseInt(discordUser.id) >> 22) % 6}.png`,
+        global_name: discordUser.global_name || discordUser.username
       };
       
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
       localStorage.setItem(TOKEN_STORAGE_KEY, tokens.access_token);
+      
+      // ✅ Clean up OAuth temporary data
       localStorage.removeItem('oauth_state');
+      localStorage.removeItem('pkce_code_verifier');
       
       await base44.auth.ensureProfile(user);
       

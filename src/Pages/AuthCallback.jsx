@@ -30,13 +30,21 @@ export default function AuthCallback() {
         // Success - redirect to dashboard
         setTimeout(() => navigate('/dashboard'), 500);
       } catch (err) {
-        console.error('Auth error:', err);
-        console.error('Error details:', err.message);
+        console.error('Authentication error:', err);
+        console.error('Error message:', err.message);
         
-        // Provide user-friendly error message
-        const errorMessage = err.message === 'Invalid state' 
-          ? 'Session expired. Please login again.'
-          : 'Authentication failed. Please try again.';
+        // ✅ 100% REALISTIC: Provide specific error messages for different failure scenarios
+        let errorMessage = 'Authentication failed. Please try again.';
+        
+        if (err.message.includes('Invalid state')) {
+          errorMessage = 'Session expired. Please login again.';
+        } else if (err.message.includes('Invalid PKCE')) {
+          errorMessage = 'Security error. Please login again.';
+        } else if (err.message.includes('Discord')) {
+          errorMessage = 'Discord authentication failed. Check your Discord account and try again.';
+        } else if (err.message.includes('Invalid credentials')) {
+          errorMessage = 'Invalid Discord credentials. Please make sure Discord is properly linked.';
+        }
         
         setError(errorMessage);
         
