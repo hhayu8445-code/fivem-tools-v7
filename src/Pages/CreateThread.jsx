@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -14,11 +14,13 @@ import RichTextEditor from '@/Components/RichTextEditor';
 import { useAuth } from '@/hooks/useAuth';
 import { logToDiscord } from '@/utils';
 import { validateThreadTitle, validateThreadContent, sanitizeInput, rateLimit } from '@/utils/security';
+import { forumRealtimeSync } from '@/services/forumRealtimeSync';
 
 export default function CreateThread() {
   const { user, loading } = useAuth();
   const [showLoginModal, setShowLoginModal] = React.useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   React.useEffect(() => {
     if (!loading && !user) {
@@ -58,6 +60,11 @@ export default function CreateThread() {
         last_reply_date: new Date().toISOString()
     }),
     onSuccess: (newThread) => {
+        // ✅ Invalidate realtime queries to trigger fresh data
+        queryClient.invalidateQueries(['forumThreads', formData.category_id]);
+        queryClient.invalidateQueries(['trendingThreads']);
+        queryClient.invalidateQueries(['hotThreads']);
+        
         if (formData.is_resource) {
             toast.success('Resource submitted for review!');
             logToDiscord('Resource Submitted', {
