@@ -32,18 +32,23 @@ export default function AuthCallback() {
       } catch (err) {
         console.error('Authentication error:', err);
         console.error('Error message:', err.message);
+        console.error('Full error:', err);
         
-        // ✅ 100% REALISTIC: Provide specific error messages for different failure scenarios
+        // ✅ Provide specific error messages for different failure scenarios
         let errorMessage = 'Authentication failed. Please try again.';
         
         if (err.message.includes('Invalid state')) {
           errorMessage = 'Session expired. Please login again.';
         } else if (err.message.includes('Invalid PKCE')) {
           errorMessage = 'Security error. Please login again.';
+        } else if (err.message.includes('Security error')) {
+          errorMessage = 'Security error. Please login again and allow all permissions.';
         } else if (err.message.includes('Discord')) {
           errorMessage = 'Discord authentication failed. Check your Discord account and try again.';
-        } else if (err.message.includes('Invalid credentials')) {
-          errorMessage = 'Invalid Discord credentials. Please make sure Discord is properly linked.';
+        } else if (err.message.includes('Invalid credentials') || err.message.includes('client_secret')) {
+          errorMessage = 'Invalid Discord credentials. Please contact support.';
+        } else if (err.message.includes('No access token')) {
+          errorMessage = 'Could not get Discord access token. Please try again.';
         }
         
         setError(errorMessage);

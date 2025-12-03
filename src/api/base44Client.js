@@ -199,11 +199,17 @@ export const base44 = {
       
       // Exchange authorization code for access token via Discord OAuth
       try {
+        const clientSecret = import.meta.env.VITE_DISCORD_CLIENT_SECRET;
+        if (!clientSecret) {
+          throw new Error('Discord client secret not configured');
+        }
+        
         const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
             client_id: DISCORD_CLIENT_ID,
+            client_secret: clientSecret,
             code: code,
             grant_type: 'authorization_code',
             redirect_uri: DISCORD_REDIRECT_URI,
@@ -213,6 +219,7 @@ export const base44 = {
         
         if (!tokenResponse.ok) {
           const errorData = await tokenResponse.text();
+          console.error('Token response error:', errorData);
           throw new Error(`Discord token exchange failed: ${tokenResponse.status}`);
         }
         
@@ -222,7 +229,7 @@ export const base44 = {
         }
       } catch (err) {
         console.error('Discord OAuth token exchange error:', err);
-        throw new Error('Failed to authenticate with Discord. Please try again.');
+        throw new Error('Security error. Failed to authenticate with Discord. Please try again.');
       }
       
       // Fetch Discord user data - REAL DISCORD ACCOUNT REQUIRED
