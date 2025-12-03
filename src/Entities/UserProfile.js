@@ -50,6 +50,27 @@
       "type": "boolean",
       "default": false
     },
+    "ban_reason": {
+      "type": "string",
+      "description": "Reason for ban"
+    },
+    "banned_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When user was banned"
+    },
+    "banned_by": {
+      "type": "string",
+      "description": "Admin who banned the user"
+    },
+    "total_downloads": {
+      "type": "number",
+      "default": 0
+    },
+    "username": {
+      "type": "string",
+      "description": "Discord username"
+    },
     "last_seen": {
       "type": "string",
       "format": "date-time"
