@@ -45,9 +45,11 @@ export default function AuthCallback() {
         } else if (errorMsg.includes('Invalid PKCE')) {
           errorMessage = 'Security error. Please login again.';
         } else if (errorMsg.includes('invalid_grant')) {
-          errorMessage = 'Authorization code expired or invalid. Please login again.';
+          errorMessage = 'Authorization code expired or was already used. Please login again.';
+        } else if (errorMsg.includes('invalid_client')) {
+          errorMessage = 'Server configuration error. Please contact support.';
         } else if (errorMsg.includes('invalid_request')) {
-          errorMessage = 'Invalid authentication request. Verify your Discord app settings.';
+          errorMessage = 'Invalid authentication request. Please try logging in again.';
         } else if (errorMsg.includes('unauthorized_client')) {
           errorMessage = 'Discord app is not authorized. Check your Discord OAuth2 settings.';
         } else if (errorMsg.includes('Server configuration error')) {
@@ -64,13 +66,15 @@ export default function AuthCallback() {
           errorMessage = 'Invalid Discord credentials. Please contact support.';
         } else if (errorMsg.includes('connection') || errorMsg.includes('network')) {
           errorMessage = 'Network error. Please check your internet connection and try again.';
+        } else if (errorMsg.includes('already used')) {
+          errorMessage = 'This code was already used. Please login again.';
         }
 
         setError(errorMessage);
         console.error('Final error message for user:', errorMessage);
 
-        // Redirect after 4 seconds
-        setTimeout(() => navigate('/'), 4000);
+        // Redirect after 5 seconds to give user time to read the message
+        setTimeout(() => navigate('/'), 5000);
       }
     };
 

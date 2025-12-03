@@ -186,6 +186,13 @@ export const base44 = {
     handleCallback: async (code, state) => {
       console.log('[Client OAuth] Starting callback handler...');
 
+      // ✅ Check if code was already used (stored in session)
+      const usedCodes = sessionStorage.getItem('used_oauth_codes')?.split(',') || [];
+      if (usedCodes.includes(code)) {
+        console.error('[Client OAuth] Code already used - this prevents double-use attacks');
+        throw new Error('Authorization code already used. Please login again.');
+      }
+
       const savedState = localStorage.getItem('oauth_state');
       if (state !== savedState) {
         console.error('[Client OAuth] State mismatch. Expected:', savedState, 'Got:', state);
@@ -222,6 +229,14 @@ export const base44 = {
         if (!response.ok) {
           console.error('[Client OAuth] Backend returned error:', response.status, responseData);
           const errorMessage = responseData.error || `Server error (${response.status})`;
+          
+          // ✅ Mark code as used if we get invalid_grant or similar errors
+          if (errorMessage.includes('invalid_grant') || errorMessage.includes('already used')) {
+            usedCodes.push(code);
+            sessionStorage.setItem('used_oauth_codes', usedCodes.join(','));
+            console.log('[Client OAuth] Code marked as used');
+          }
+          
           throw new Error(errorMessage);
         }
 
@@ -244,6 +259,10 @@ export const base44 = {
         // Store token
         localStorage.setItem(TOKEN_STORAGE_KEY, access_token);
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+
+        // ✅ Mark code as used to prevent re-use attacks
+        usedCodes.push(code);
+        sessionStorage.setItem('used_oauth_codes', usedCodes.join(','));
 
         // ✅ Clean up OAuth temporary data
         localStorage.removeItem('oauth_state');

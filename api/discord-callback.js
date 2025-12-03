@@ -15,23 +15,37 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing code or codeVerifier' });
   }
 
-  const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-  const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-  const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI;
+  // ✅ Try multiple environment variable sources for flexibility
+  let DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+  let DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
+  let DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI;
+
+  // Fallback to alternative env var names if not found
+  if (!DISCORD_CLIENT_ID) {
+    DISCORD_CLIENT_ID = process.env.VITE_DISCORD_CLIENT_ID;
+  }
+  if (!DISCORD_CLIENT_SECRET) {
+    DISCORD_CLIENT_SECRET = process.env.VITE_DISCORD_CLIENT_SECRET;
+  }
+  if (!DISCORD_REDIRECT_URI) {
+    DISCORD_REDIRECT_URI = process.env.VITE_DISCORD_REDIRECT_URI;
+  }
 
   // ✅ Enhanced validation with detailed logging
   if (!DISCORD_CLIENT_ID) {
-    console.error('[AUTH] Missing DISCORD_CLIENT_ID');
+    console.error('[AUTH] Missing DISCORD_CLIENT_ID - checked both DISCORD_CLIENT_ID and VITE_DISCORD_CLIENT_ID');
     return res.status(500).json({ error: 'Server configuration error: Missing CLIENT_ID' });
   }
   if (!DISCORD_CLIENT_SECRET) {
-    console.error('[AUTH] Missing DISCORD_CLIENT_SECRET');
+    console.error('[AUTH] Missing DISCORD_CLIENT_SECRET - checked both DISCORD_CLIENT_SECRET and VITE_DISCORD_CLIENT_SECRET');
     return res.status(500).json({ error: 'Server configuration error: Missing CLIENT_SECRET' });
   }
   if (!DISCORD_REDIRECT_URI) {
-    console.error('[AUTH] Missing DISCORD_REDIRECT_URI');
+    console.error('[AUTH] Missing DISCORD_REDIRECT_URI - checked both DISCORD_REDIRECT_URI and VITE_DISCORD_REDIRECT_URI');
     return res.status(500).json({ error: 'Server configuration error: Missing REDIRECT_URI' });
   }
+
+  console.log('[AUTH] Config loaded successfully. CLIENT_ID:', DISCORD_CLIENT_ID.substring(0, 10) + '...');
 
   console.log('[AUTH] Config valid. Exchanging code for token...');
 
@@ -59,18 +73,36 @@ export default async function handler(req, res) {
     if (!tokenResponse.ok) {
       console.error(`[AUTH] Discord token error (${tokenResponse.status}):`, tokenResponseText);
 
-      // ✅ Parse and provide specific error
+      // ✅ Parse and provide specific error with detailed mapping
       let errorDetail = 'Discord authentication failed';
+      let errorCode = null;
       try {
         const errorJson = JSON.parse(tokenResponseText);
-        errorDetail = errorJson.error || errorJson.error_description || errorDetail;
+        errorCode = errorJson.error;
+        errorDetail = errorJson.error_description || errorJson.error || errorDetail;
         console.error('[AUTH] Discord error response:', errorJson);
+
+        // Map Discord OAuth error codes to user-friendly messages
+        if (errorCode === 'invalid_grant') {
+          console.error('[AUTH] Authorization code expired or invalid');
+          errorDetail = 'invalid_grant - Code may have been used already or expired. Please try logging in again.';
+        } else if (errorCode === 'invalid_client') {
+          console.error('[AUTH] Invalid client ID or secret');
+          errorDetail = 'invalid_client - Server configuration issue. Please contact support.';
+        } else if (errorCode === 'invalid_request') {
+          console.error('[AUTH] Invalid request parameters');
+          errorDetail = 'invalid_request - Authentication request was invalid. Please try again.';
+        } else if (errorCode === 'unauthorized_client') {
+          console.error('[AUTH] Client not authorized for this redirect URI');
+          errorDetail = 'unauthorized_client - This app is not authorized for your Discord server. Please contact support.';
+        }
       } catch (e) {
-        console.error('[AUTH] Could not parse error response');
+        console.error('[AUTH] Could not parse error response:', e);
       }
 
       return res.status(tokenResponse.status).json({
         error: errorDetail,
+        error_code: errorCode,
         debug: process.env.NODE_ENV !== 'production' ? tokenResponseText : undefined
       });
     }
