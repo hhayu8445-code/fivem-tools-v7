@@ -27,11 +27,21 @@ export default function AuthCallback() {
 
       try {
         await base44.auth.handleCallback(code, state);
-        navigate('/dashboard');
+        // Success - redirect to dashboard
+        setTimeout(() => navigate('/dashboard'), 500);
       } catch (err) {
         console.error('Auth error:', err);
-        setError('Authentication failed. Please try again.');
-        setTimeout(() => navigate('/'), 3000);
+        console.error('Error details:', err.message);
+        
+        // Provide user-friendly error message
+        const errorMessage = err.message === 'Invalid state' 
+          ? 'Session expired. Please login again.'
+          : 'Authentication failed. Please try again.';
+        
+        setError(errorMessage);
+        
+        // Redirect after 4 seconds
+        setTimeout(() => navigate('/'), 4000);
       }
     };
 
