@@ -187,98 +187,54 @@ export const base44 = {
       const savedState = localStorage.getItem('oauth_state');
       if (state !== savedState) throw new Error('Invalid state');
       
-      // ✅ FIXED: 100% REALISTIC Discord OAuth flow - FULL DISCORD ACCOUNT ONLY
-      // No anonymous/fallback users - all authentication must be from real Discord accounts
-      let tokens = null;
-      
       // Get PKCE code verifier for secure token exchange
       const codeVerifier = localStorage.getItem('pkce_code_verifier');
       if (!codeVerifier) {
         throw new Error('Invalid PKCE session. Please login again.');
       }
       
-      // Exchange authorization code for access token via Discord OAuth
+      // ✅ SECURE: Call backend API to exchange code for token
+      // Client secret is now safely stored on backend
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '/api';
+      
       try {
-        const clientSecret = import.meta.env.VITE_DISCORD_CLIENT_SECRET;
-        if (!clientSecret) {
-          throw new Error('Discord client secret not configured');
-        }
-        
-        const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+        const response = await fetch(`${backendUrl}/discord-callback`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            client_id: DISCORD_CLIENT_ID,
-            client_secret: clientSecret,
-            code: code,
-            grant_type: 'authorization_code',
-            redirect_uri: DISCORD_REDIRECT_URI,
-            code_verifier: codeVerifier
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, codeVerifier })
         });
         
-        if (!tokenResponse.ok) {
-          const errorData = await tokenResponse.text();
-          console.error('Token response error:', errorData);
-          throw new Error(`Discord token exchange failed: ${tokenResponse.status}`);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Authentication failed');
         }
         
-        tokens = await tokenResponse.json();
-        if (!tokens.access_token) {
-          throw new Error('No access token received from Discord');
+        const { user, access_token } = await response.json();
+        
+        if (!user || !access_token) {
+          throw new Error('Invalid response from authentication server');
         }
+        
+        // Store token
+        localStorage.setItem(TOKEN_STORAGE_KEY, access_token);
+        
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+      
+        
+        // ✅ Clean up OAuth temporary data
+        localStorage.removeItem('oauth_state');
+        localStorage.removeItem('pkce_code_verifier');
+        
+        await base44.auth.ensureProfile(user);
+        
+        // Trigger custom event to notify Layout about auth change
+        window.dispatchEvent(new Event('auth-changed'));
+        
+        return user;
       } catch (err) {
-        console.error('Discord OAuth token exchange error:', err);
-        throw new Error('Security error. Failed to authenticate with Discord. Please try again.');
+        console.error('Backend OAuth error:', err);
+        throw new Error('Failed to authenticate with Discord. Please try again.');
       }
-      
-      // Fetch Discord user data - REAL DISCORD ACCOUNT REQUIRED
-      let discordUser = null;
-      try {
-        const userResponse = await fetch('https://discord.com/api/users/@me', {
-          headers: { Authorization: `Bearer ${tokens.access_token}` }
-        });
-        
-        // ✅ 100% REALISTIC: Require real Discord user data - NO ANONYMOUS FALLBACK
-        if (!userResponse.ok) {
-          const errorData = await userResponse.text();
-          throw new Error(`Failed to fetch Discord user: ${userResponse.status}`);
-        }
-        
-        discordUser = await userResponse.json();
-        if (!discordUser.id) {
-          throw new Error('Invalid Discord user data received');
-        }
-      } catch (err) {
-        console.error('Discord user fetch error:', err);
-        throw new Error('Failed to fetch user data from Discord. Invalid credentials.');
-      }
-      
-      // Build user object from REAL Discord data only - no fallbacks
-      const user = {
-        id: discordUser.id,
-        email: discordUser.email || `user_${discordUser.id}@discord.local`,
-        username: discordUser.username,
-        discriminator: discordUser.discriminator,
-        avatar: discordUser.avatar 
-          ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-          : `https://cdn.discordapp.com/embed/avatars/${(parseInt(discordUser.id) >> 22) % 6}.png`,
-        global_name: discordUser.global_name || discordUser.username
-      };
-      
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      localStorage.setItem(TOKEN_STORAGE_KEY, tokens.access_token);
-      
-      // ✅ Clean up OAuth temporary data
-      localStorage.removeItem('oauth_state');
-      localStorage.removeItem('pkce_code_verifier');
-      
-      await base44.auth.ensureProfile(user);
-      
-      // Trigger custom event to notify Layout about auth change
-      window.dispatchEvent(new Event('auth-changed'));
-      
-      return user;
     },
     ensureProfile: async (user) => {
       const profiles = await base44.entities.UserProfile.list({ 
