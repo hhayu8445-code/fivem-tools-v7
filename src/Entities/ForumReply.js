@@ -1,7 +1,7 @@
 {
   "name": "ForumReply",
-  "type": "object",
-  "properties": {
+    "type": "object",
+      "properties": {
     "content": {
       "type": "string"
     },
@@ -19,30 +19,30 @@
     },
     "likes_count": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "score": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "reports_count": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "created_date": {
       "type": "string",
-      "format": "date-time"
+        "format": "date-time"
     },
     "updated_date": {
       "type": "string",
-      "format": "date-time"
+        "format": "date-time"
     },
     "updated_by": {
       "type": "string"
     },
     "is_deleted": {
       "type": "boolean",
-      "default": false
+        "default": false
     },
     "deleted_reason": {
       "type": "string"
@@ -52,7 +52,7 @@
     },
     "deleted_date": {
       "type": "string",
-      "format": "date-time"
+        "format": "date-time"
     }
   },
   "required": [

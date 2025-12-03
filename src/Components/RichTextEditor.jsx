@@ -6,7 +6,7 @@ const EDITOR_MODULES = {
   toolbar: [
     [{ 'header': [1, 2, 3, false] }],
     ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{'list': 'ordered'}, {'list': 'bullet'}],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
     ['link', 'image', 'code-block'],
     ['clean']
   ],

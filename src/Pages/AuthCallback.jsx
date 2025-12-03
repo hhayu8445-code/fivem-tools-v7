@@ -33,13 +33,13 @@ export default function AuthCallback() {
         console.error('Authentication error:', err);
         console.error('Error message:', err.message);
         console.error('Full error:', err);
-        
+
         // ✅ Provide specific error messages for different failure scenarios
         let errorMessage = 'Authentication failed. Please try again.';
-        
+
         // Parse error messages to provide specific guidance
         const errorMsg = err.message || '';
-        
+
         if (errorMsg.includes('Invalid state')) {
           errorMessage = 'Session expired. Please login again.';
         } else if (errorMsg.includes('Invalid PKCE')) {
@@ -65,10 +65,10 @@ export default function AuthCallback() {
         } else if (errorMsg.includes('connection') || errorMsg.includes('network')) {
           errorMessage = 'Network error. Please check your internet connection and try again.';
         }
-        
+
         setError(errorMessage);
         console.error('Final error message for user:', errorMessage);
-        
+
         // Redirect after 4 seconds
         setTimeout(() => navigate('/'), 4000);
       }

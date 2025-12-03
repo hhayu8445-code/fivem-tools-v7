@@ -58,7 +58,7 @@ export default async function handler(req, res) {
 
     if (!tokenResponse.ok) {
       console.error(`[AUTH] Discord token error (${tokenResponse.status}):`, tokenResponseText);
-      
+
       // ✅ Parse and provide specific error
       let errorDetail = 'Discord authentication failed';
       try {
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
         console.error('[AUTH] Could not parse error response');
       }
 
-      return res.status(tokenResponse.status).json({ 
+      return res.status(tokenResponse.status).json({
         error: errorDetail,
         debug: process.env.NODE_ENV !== 'production' ? tokenResponseText : undefined
       });
@@ -111,7 +111,7 @@ export default async function handler(req, res) {
         email: discordUser.email || `user_${discordUser.id}@discord.local`,
         username: discordUser.username,
         discriminator: discordUser.discriminator,
-        avatar: discordUser.avatar 
+        avatar: discordUser.avatar
           ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
           : `https://cdn.discordapp.com/embed/avatars/${(parseInt(discordUser.id) >> 22) % 6}.png`,
         global_name: discordUser.global_name || discordUser.username
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('[AUTH] Unhandled error:', error);
     console.error('[AUTH] Error stack:', error.stack);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Internal server error during authentication',
       debug: process.env.NODE_ENV !== 'production' ? error.message : undefined
     });

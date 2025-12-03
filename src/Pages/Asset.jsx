@@ -86,7 +86,7 @@ export default function AssetDetail() {
                 const today = new Date().toISOString().split('T')[0];
                 const lastDownloadDate = userProfile.last_download_date?.split('T')[0];
                 const dailyCount = lastDownloadDate === today ? (userProfile.daily_downloads_count || 0) + 1 : 1;
-                
+
                 await base44.entities.UserProfile.update(userProfile.id, {
                     daily_downloads_count: dailyCount,
                     last_download_date: new Date().toISOString(),
@@ -110,8 +110,8 @@ export default function AssetDetail() {
                 email: user.email,
                 user_id: user.id,
                 description: `📥 Downloaded: ${asset.title}`,
-                extra: { 
-                    'Asset ID': asset.id, 
+                extra: {
+                    'Asset ID': asset.id,
                     'Category': asset.category,
                     'Membership': userProfile?.membership_tier || 'free',
                     'Download Count': (asset.downloads || 0) + 1,
@@ -231,7 +231,7 @@ export default function AssetDetail() {
                                         <p key={i} className="text-zinc-400">{paragraph}</p>
                                     ))}
                                 </div>
-                                
+
                                 {/* Features Section */}
                                 <div className="mt-6 pt-6 border-t border-zinc-800">
                                     <h3 className="text-lg font-semibold text-white mb-3">✨ Features</h3>
@@ -355,7 +355,7 @@ export default function AssetDetail() {
                                     <span className="text-sm font-semibold text-green-400">Virus Scan</span>
                                 </div>
                                 <p className="text-xs text-zinc-400 mb-3">Check this file for viruses before downloading</p>
-                                <a 
+                                <a
                                     href={`https://www.virustotal.com/gui/url/${encodeURIComponent(asset.download_url)}/detection`}
                                     target="_blank"
                                     rel="noopener noreferrer"

@@ -14,7 +14,7 @@ export function getAchievements(profile) {
     username: profile.username ? preventXSS(profile.username) : '',
     bio: profile.bio ? preventXSS(profile.bio) : '',
   };
-  
+
   const list = [];
 
   if (sanitizedProfile.posts_count >= 1) list.push({ name: 'First Words', desc: 'Made your first post', icon: 'https://cdn3d.iconscout.com/3d/premium/thumb/message-3d-icon-png-download-5576258.png', color: 'text-blue-400 bg-blue-500/10' });

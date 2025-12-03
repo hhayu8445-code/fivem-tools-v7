@@ -1,7 +1,7 @@
 {
   "name": "ForumThread",
-  "type": "object",
-  "properties": {
+    "type": "object",
+      "properties": {
     "title": {
       "type": "string"
     },
@@ -22,50 +22,50 @@
     },
     "views": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "replies_count": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "likes_count": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "score": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "reports_count": {
       "type": "number",
-      "default": 0
+        "default": 0
     },
     "is_pinned": {
       "type": "boolean",
-      "default": false
+        "default": false
     },
     "is_locked": {
       "type": "boolean",
-      "default": false
+        "default": false
     },
     "last_reply_date": {
       "type": "string",
-      "format": "date-time"
+        "format": "date-time"
     },
     "created_date": {
       "type": "string",
-      "format": "date-time"
+        "format": "date-time"
     },
     "updated_date": {
       "type": "string",
-      "format": "date-time"
+        "format": "date-time"
     },
     "updated_by": {
       "type": "string"
     },
     "is_deleted": {
       "type": "boolean",
-      "default": false
+        "default": false
     },
     "deleted_reason": {
       "type": "string"
@@ -75,7 +75,7 @@
     },
     "deleted_date": {
       "type": "string",
-      "format": "date-time"
+        "format": "date-time"
     }
   },
   "required": [
