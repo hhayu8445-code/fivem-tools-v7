@@ -701,7 +701,7 @@ export default function UpvotesServer() {
                             </div>
 
                             <Button
-                                onClick={() => window.open('https://discord.gg/WYR27uKFns', '_blank')}
+                                onClick={() => window.open('https://discord.gg/fivemtools', '_blank')}
                                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 h-14 text-lg font-bold shadow-lg"
                             >
                                 <img src="https://cdn-icons-png.flaticon.com/512/14857/14857399.png" className="w-6 h-6 mr-3" alt="Discord" />

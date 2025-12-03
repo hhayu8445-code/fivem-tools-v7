@@ -319,7 +319,7 @@ export default function DecryptAssets() {
                         </div>
                         <div className="flex-1">
                           <p className="text-sm text-zinc-300 font-medium">Join our Discord server</p>
-                          <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-lg transition-colors font-medium">
+                          <a href="https://discord.gg/fivemtools" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm rounded-lg transition-colors font-medium">
                             <img src="https://cdn-icons-png.flaticon.com/512/14857/14857399.png" className="w-4 h-4" alt="Discord" />
                             Join Discord Server
                           </a>

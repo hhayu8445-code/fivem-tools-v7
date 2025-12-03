@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="border-t border-zinc-800/50 bg-zinc-950/30 backdrop-blur-sm mt-20">
       {/* Sponsor Banners */}
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-4">
-        <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
+        <a href="https://discord.gg/fivemtools" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
           <img 
             src="https://r2.fivemanage.com/pjW8diq5cgbXePkRb7YQg/letraserverlistgif.gif"
             alt="Sponsor Banner" 
@@ -14,7 +14,7 @@ export default function Footer() {
             loading="lazy"
           />
         </a>
-        <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
+        <a href="https://discord.gg/tZXg4GVRM5" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
           <img 
             src="https://r2.fivemanage.com/pjW8diq5cgbXePkRb7YQg/serverlist_iteration_1.gif"
             alt="Sponsor Banner" 
@@ -70,7 +70,7 @@ export default function Footer() {
               <a href="#" className="text-zinc-500 hover:text-white transition-colors">
                 <img src="https://img.icons8.com/3d-fluency/94/github.png" className="w-6 h-6" alt="GitHub" />
               </a>
-              <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-indigo-400 transition-colors">
+              <a href="https://discord.gg/fivemtools" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-indigo-400 transition-colors">
                 <img src="https://cdn-icons-png.flaticon.com/512/14857/14857399.png" className="w-6 h-6" alt="Discord" />
               </a>
               <a href="#" className="text-zinc-500 hover:text-pink-500 transition-colors">

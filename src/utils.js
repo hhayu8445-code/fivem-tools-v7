@@ -53,7 +53,8 @@ export const CONFIG = {
   SITE_NAME: 'FiveM Tools V7',
   SITE_DESCRIPTION: 'Premium FiveM Scripts, MLOs, Vehicles & EUP - Ultimate Resource Hub for ESX & QBCore Servers',
   SITE_URL: 'https://fivemtools.net',
-  DISCORD_URL: 'https://discord.gg/WYR27uKFns',
+  DISCORD_URL: 'https://discord.gg/fivemtools',
+  DISCORD_URL_ALT: 'https://discord.gg/tZXg4GVRM5',
 };
 
 export function getIconUrl(iconName) {

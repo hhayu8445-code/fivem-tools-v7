@@ -148,7 +148,7 @@ const SidebarContent = () => {
         <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-xl p-3 border border-zinc-800 relative overflow-hidden">
           <div className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Quick Links</div>
           <div className="space-y-1">
-            <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 transition-colors group">
+            <a href="https://discord.gg/fivemtools" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 transition-colors group">
               <img src="https://cdn-icons-png.flaticon.com/512/14857/14857399.png" className="w-4 h-4 group-hover:scale-110 transition-transform" alt="Discord" />
               <span className="text-xs text-zinc-400 group-hover:text-white transition-colors">Join Discord</span>
             </a>
@@ -467,7 +467,7 @@ export default function Layout({ children }) {
 
               {/* Discord Link */}
               <a
-                href="https://discord.gg/WYR27uKFns"
+                href="https://discord.gg/fivemtools"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-10 w-10 flex items-center justify-center rounded-full text-zinc-400 hover:text-[#5865F2] hover:bg-zinc-800/50 transition-all"
