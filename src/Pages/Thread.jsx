@@ -16,9 +16,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from '@/Components/ui/label';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  useThreadSync,
-  useThreadRepliesSync,
-  useForumSyncManager
+    useThreadSync,
+    useThreadRepliesSync,
+    useForumSyncManager
 } from '@/hooks/useForumSync';
 import {
     DropdownMenu,
@@ -50,11 +50,11 @@ export default function Thread() {
 
     // ✅ Auto-update loading states when data arrives
     useEffect(() => {
-      if (thread) setThreadLoading(false);
+        if (thread) setThreadLoading(false);
     }, [thread]);
 
     useEffect(() => {
-      if (replies && replies.length >= 0) setRepliesLoading(false);
+        if (replies && replies.length >= 0) setRepliesLoading(false);
     }, [replies]);
 
     // ✅ Fetch user profile

@@ -35,9 +35,9 @@ export default function Community() {
 
     // ✅ Auto-update loading state for trending
     useEffect(() => {
-      if (recentThreads && recentThreads.length >= 0) {
-        setThreadsLoading(false);
-      }
+        if (recentThreads && recentThreads.length >= 0) {
+            setThreadsLoading(false);
+        }
     }, [recentThreads]);
 
     // ✅ REALTIME SYNC: Event-driven hot threads (updated every 8 seconds)
@@ -45,9 +45,9 @@ export default function Community() {
 
     // ✅ Auto-update loading state for hot
     useEffect(() => {
-      if (hotThreads && hotThreads.length >= 0) {
-        setHotLoading(false);
-      }
+        if (hotThreads && hotThreads.length >= 0) {
+            setHotLoading(false);
+        }
     }, [hotThreads]);
 
     const { data: categories, isLoading: catsLoading } = useQuery({
