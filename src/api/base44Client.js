@@ -13,6 +13,14 @@ if (!API_KEY || !APP_ID) {
   );
 }
 
+// ✅ PKCE Helper: Convert Uint8Array to base64url string
+const base64url = (bytes) => {
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+};
+
 const BASE_URL = `https://app.base44.com/api/apps/${APP_ID}/entities`;
 
 // Helper to construct query string from object
@@ -122,15 +130,28 @@ export const base44 = {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
       window.location.href = '/';
     },
-    login: () => {
+    login: async () => {
       const state = Math.random().toString(36).substring(7);
       localStorage.setItem('oauth_state', state);
+      
+      // ✅ Generate PKCE code verifier for secure OAuth flow
+      const codeVerifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+      localStorage.setItem('pkce_code_verifier', codeVerifier);
+      
+      // Calculate PKCE code challenge
+      const encoder = new TextEncoder();
+      const data = encoder.encode(codeVerifier);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const codeChallenge = base64url(new Uint8Array(hashBuffer));
+      
       const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
         redirect_uri: DISCORD_REDIRECT_URI,
         response_type: 'code',
         scope: 'identify email guilds',
-        state: state
+        state: state,
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256'
       });
       window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
     },
