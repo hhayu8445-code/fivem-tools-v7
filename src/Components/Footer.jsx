@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-4">
         <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
           <img 
-            src="https://cdn.discordapp.com/attachments/1350474784395235469/1425461397210267678/letra_serverlist_gif.gif" 
+            src="https://r2.fivemanage.com/pjW8diq5cgbXePkRb7YQg/letraserverlistgif.gif"
             alt="Sponsor Banner" 
             className="w-full h-auto"
             loading="lazy"
@@ -16,7 +16,7 @@ export default function Footer() {
         </a>
         <a href="https://discord.gg/WYR27uKFns" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden border border-zinc-800/50 bg-zinc-900/50 hover:border-fuchsia-500/50 transition-all">
           <img 
-            src="https://cdn.discordapp.com/attachments/1350474784395235469/1410460678896091237/serverlist_iteration_1.gif" 
+            src="https://r2.fivemanage.com/pjW8diq5cgbXePkRb7YQg/serverlist_iteration_1.gif"
             alt="Sponsor Banner" 
             className="w-full h-auto"
             loading="lazy"

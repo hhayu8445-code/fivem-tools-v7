@@ -143,7 +143,7 @@ export default function Community() {
                     {/* Video Sponsor */}
                     <div className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950">
                         <video
-                            src="https://cdn.discordapp.com/attachments/1350474981871583344/1377200664903553044/render.mp4?ex=692ea211&is=692d5091&hm=c3e7727cd0d569b159ba2ebf01579a1f3c1ccd5dd5e4e1945b97c936c3fade1a&"
+                            src="https://r2.fivemanage.com/pjW8diq5cgbXePkRb7YQg/ts(1).mp4"
                             autoPlay
                             loop
                             muted
@@ -155,7 +155,7 @@ export default function Community() {
                     {/* Video Sponsor 2 */}
                     <div className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950">
                         <video
-                            src="https://cdn.discordapp.com/attachments/1350474981871583344/1392667446028271636/ts.mp4?ex=692edee1&is=692d8d61&hm=594aaddfa1ced3e23537ed917f13d30e1f08070331fef01f52c1c284ac089d2f&"
+                            src="https://r2.fivemanage.com/pjW8diq5cgbXePkRb7YQg/render.mp4"
                             autoPlay
                             loop
                             muted

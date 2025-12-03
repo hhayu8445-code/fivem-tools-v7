@@ -61,29 +61,67 @@ export default function AssetDetail() {
 
     const logDownloadMutation = useMutation({
         mutationFn: async () => {
-            await base44.entities.DownloadLog.create({
+            // ✅ Log download with detailed info
+            const downloadLog = await base44.entities.DownloadLog.create({
                 user_email: user.email,
                 asset_id: asset.id,
-                download_date: new Date().toISOString()
+                download_date: new Date().toISOString(),
+                // ✅ Add detailed tracking
+                user_id: user.id,
+                username: user.username,
+                asset_title: asset.title,
+                asset_category: asset.category,
+                user_profile_tier: userProfile?.membership_tier || 'free',
+                ip_info: `Browser - ${navigator.userAgent.substring(0, 50)}`
             });
+
+            // ✅ Increment asset download counter
+            const currentDownloads = asset.downloads || 0;
+            await base44.entities.Asset.update(asset.id, {
+                downloads: currentDownloads + 1
+            });
+
+            // ✅ Increment user profile daily downloads
+            if (userProfile) {
+                const today = new Date().toISOString().split('T')[0];
+                const lastDownloadDate = userProfile.last_download_date?.split('T')[0];
+                const dailyCount = lastDownloadDate === today ? (userProfile.daily_downloads_count || 0) + 1 : 1;
+                
+                await base44.entities.UserProfile.update(userProfile.id, {
+                    daily_downloads_count: dailyCount,
+                    last_download_date: new Date().toISOString(),
+                    total_downloads: (userProfile.total_downloads || 0) + 1
+                });
+            }
 
             // Check for first download achievement
             const achievement = await checkAndAwardAchievement(user.email, 'first_download');
             if (achievement) {
                 toast.success('🎉 Achievement Unlocked: First Download!', { duration: 5000 });
             }
+
+            return downloadLog;
         },
-        onSuccess: () => {
+        onSuccess: (downloadLog) => {
             toast.success('Download started!');
             logToDiscord('Asset Downloaded', {
                 type: 'download',
-                user: user.full_name || user.username,
+                user: user.username,
                 email: user.email,
+                user_id: user.id,
                 description: `📥 Downloaded: ${asset.title}`,
-                extra: { 'Asset ID': asset.id, 'Category': asset.category }
+                extra: { 
+                    'Asset ID': asset.id, 
+                    'Category': asset.category,
+                    'Membership': userProfile?.membership_tier || 'free',
+                    'Download Count': (asset.downloads || 0) + 1,
+                    'Asset Size': asset.file_size,
+                    'Version': asset.version
+                }
             });
         },
-        onError: () => {
+        onError: (error) => {
+            console.error('Download logging error:', error);
             toast.error('Failed to log download');
         }
     });

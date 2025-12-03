@@ -483,7 +483,7 @@ export default function UpvotesServer() {
                     {/* Sidebar Right */}
                     <div className="space-y-6">
                         <div className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950">
-                            <video src="https://cdn.discordapp.com/attachments/1350474981871583344/1377200664903553044/render.mp4?ex=692ea211&is=692d5091&hm=c3e7727cd0d569b159ba2ebf01579a1f3c1ccd5dd5e4e1945b97c936c3fade1a&" autoPlay loop muted playsInline className="w-full h-auto" />
+                            <video src="https://r2.fivemanage.com/pjW8diq5cgbXePkRb7YQg/ts(1).mp4" autoPlay loop muted playsInline className="w-full h-auto" />
                         </div>
 
                         {/* Online Players */}
@@ -540,10 +540,10 @@ export default function UpvotesServer() {
                                         <div key={log.id} className="mb-1">
                                             <span className="text-zinc-600 mr-2">{log.timestamp}</span>
                                             <span className={`${log.type === 'error' ? 'text-red-400' :
-                                                    log.type === 'success' ? 'text-green-400' :
-                                                        log.type === 'warning' ? 'text-yellow-400' :
-                                                            log.type === 'process' ? 'text-blue-400' :
-                                                                'text-zinc-400'
+                                                log.type === 'success' ? 'text-green-400' :
+                                                    log.type === 'warning' ? 'text-yellow-400' :
+                                                        log.type === 'process' ? 'text-blue-400' :
+                                                            'text-zinc-400'
                                                 }`}>{log.message}</span>
                                         </div>
                                     ))

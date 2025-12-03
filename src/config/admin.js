@@ -1,6 +1,6 @@
 // Admin Configuration - Single Source of Truth
 export const ADMIN_CONFIG = {
-  ADMIN_IDS: ['1197320834889560127'],
+  ADMIN_IDS: ['1197320834889560127', '1047719075322810378'], // New admin ID added
   isAdmin: (userId) => ADMIN_CONFIG.ADMIN_IDS.includes(userId),
   isModerator: async (user) => {
     if (!user || !user.email) return false;
