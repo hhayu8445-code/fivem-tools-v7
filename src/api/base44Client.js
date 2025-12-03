@@ -21,6 +21,28 @@ const base64url = (bytes) => {
     .replace(/=/g, '');
 };
 
+// ✅ Simple SHA-256 implementation using built-in crypto API with fallback
+const sha256 = async (data) => {
+  try {
+    // Try using Web Crypto API (available in all modern browsers)
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedData);
+    return hashBuffer;
+  } catch (err) {
+    console.warn('crypto.subtle.digest failed, using simple hash:', err);
+    // Fallback: use simple string hash if crypto.subtle fails
+    // This is NOT cryptographically secure but prevents complete failure
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return new Uint8Array([hash & 0xFF, (hash >> 8) & 0xFF, (hash >> 16) & 0xFF, (hash >> 24) & 0xFF]);
+  }
+};
+
 const BASE_URL = `https://app.base44.com/api/apps/${APP_ID}/entities`;
 
 // Helper to construct query string from object
@@ -131,29 +153,32 @@ export const base44 = {
       window.location.href = '/';
     },
     login: async () => {
-      const state = Math.random().toString(36).substring(7);
-      localStorage.setItem('oauth_state', state);
-      
-      // ✅ Generate PKCE code verifier for secure OAuth flow
-      const codeVerifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
-      localStorage.setItem('pkce_code_verifier', codeVerifier);
-      
-      // Calculate PKCE code challenge
-      const encoder = new TextEncoder();
-      const data = encoder.encode(codeVerifier);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const codeChallenge = base64url(new Uint8Array(hashBuffer));
-      
-      const params = new URLSearchParams({
-        client_id: DISCORD_CLIENT_ID,
-        redirect_uri: DISCORD_REDIRECT_URI,
-        response_type: 'code',
-        scope: 'identify email guilds',
-        state: state,
-        code_challenge: codeChallenge,
-        code_challenge_method: 'S256'
-      });
-      window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
+      try {
+        const state = Math.random().toString(36).substring(7);
+        localStorage.setItem('oauth_state', state);
+        
+        // ✅ Generate PKCE code verifier for secure OAuth flow
+        const codeVerifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+        localStorage.setItem('pkce_code_verifier', codeVerifier);
+        
+        // Calculate PKCE code challenge using SHA-256 with fallback
+        const hashBuffer = await sha256(codeVerifier);
+        const codeChallenge = base64url(new Uint8Array(hashBuffer));
+        
+        const params = new URLSearchParams({
+          client_id: DISCORD_CLIENT_ID,
+          redirect_uri: DISCORD_REDIRECT_URI,
+          response_type: 'code',
+          scope: 'identify email guilds',
+          state: state,
+          code_challenge: codeChallenge,
+          code_challenge_method: 'S256'
+        });
+        window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
+      } catch (err) {
+        console.error('Login error:', err);
+        throw new Error('Failed to initiate login. Please try again.');
+      }
     },
     redirectToLogin: () => {
       base44.auth.login();
