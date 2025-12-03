@@ -147,6 +147,52 @@ class ForumRealtimeSync {
     }
 
     /**
+     * ✅ Start syncing user profile (for admin role, membership changes, etc.)
+     */
+    startUserProfileSync(userEmail, intervalMs = 10000) {
+        if (!userEmail) return;
+
+        const key = `profile_${userEmail}`;
+        if (this.syncIntervals[key]) {
+            clearInterval(this.syncIntervals[key]);
+        }
+
+        this.syncIntervals[key] = setInterval(async () => {
+            if (!this.isEnabled) return;
+
+            try {
+                const profile = await base44.entities.UserProfile.read({
+                    user_email: userEmail
+                });
+
+                window.dispatchEvent(
+                    new CustomEvent('userProfileUpdated', { 
+                        detail: { 
+                            profile, 
+                            userEmail,
+                            membership_tier: profile?.membership_tier,
+                            is_banned: profile?.is_banned
+                        } 
+                    })
+                );
+            } catch (err) {
+                console.error('User profile sync error:', err);
+            }
+        }, intervalMs);
+    }
+
+    /**
+     * ✅ Stop syncing user profile
+     */
+    stopUserProfileSync(userEmail) {
+        const key = `profile_${userEmail}`;
+        if (this.syncIntervals[key]) {
+            clearInterval(this.syncIntervals[key]);
+            delete this.syncIntervals[key];
+        }
+    }
+
+    /**
      * ✅ Stop syncing for category
      */
     stopCategorySync(categoryId) {
@@ -171,6 +217,37 @@ class ForumRealtimeSync {
         if (this.syncIntervals[repliesKey]) {
             clearInterval(this.syncIntervals[repliesKey]);
             delete this.syncIntervals[repliesKey];
+        }
+    }
+
+    /**
+     * ✅ Stop syncing for replies (alias for consistency)
+     */
+    stopRepliesSync(threadId) {
+        const repliesKey = `replies_${threadId}`;
+        if (this.syncIntervals[repliesKey]) {
+            clearInterval(this.syncIntervals[repliesKey]);
+            delete this.syncIntervals[repliesKey];
+        }
+    }
+
+    /**
+     * ✅ Stop syncing for trending
+     */
+    stopTrendingSync() {
+        if (this.syncIntervals['trending']) {
+            clearInterval(this.syncIntervals['trending']);
+            delete this.syncIntervals['trending'];
+        }
+    }
+
+    /**
+     * ✅ Stop syncing for hot threads
+     */
+    stopHotThreadsSync() {
+        if (this.syncIntervals['hot']) {
+            clearInterval(this.syncIntervals['hot']);
+            delete this.syncIntervals['hot'];
         }
     }
 

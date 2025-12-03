@@ -12,6 +12,7 @@ import NProgress from 'nprogress';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 import { logToDiscord } from '@/utils';
 import { useAllStats } from '@/hooks/useStats';
+import { useUserProfileSync } from '@/hooks/useForumSync';
 import MemberBadge from '@/Components/MemberBadge';
 import {
   DropdownMenu,
@@ -169,6 +170,9 @@ export default function Layout({ children }) {
   const [userProfile, setUserProfile] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState('');
 
+  // Enable realtime profile sync for logged-in users
+  const syncedProfile = useUserProfileSync(user?.email);
+
   // Progress bar on route change
   React.useEffect(() => {
     NProgress.start();
@@ -201,10 +205,30 @@ export default function Layout({ children }) {
       if (e.key === 'discord_user' || e.key === 'discord_token') fetchUser();
     });
 
+    // Listen for admin role updates from realtime sync
+    const handleAdminRoleUpdate = (event) => {
+      if (event.detail.userEmail === user?.email) {
+        setUserProfile(prev => ({
+          ...prev,
+          membership_tier: event.detail.membership_tier,
+          is_banned: event.detail.is_banned
+        }));
+      }
+    };
+    window.addEventListener('adminRoleUpdated', handleAdminRoleUpdate);
+
     return () => {
       window.removeEventListener('auth-changed', handleAuthChange);
+      window.removeEventListener('adminRoleUpdated', handleAdminRoleUpdate);
     };
-  }, []);
+  }, [user?.email]);
+
+  // Update userProfile when synced profile changes
+  React.useEffect(() => {
+    if (syncedProfile) {
+      setUserProfile(syncedProfile);
+    }
+  }, [syncedProfile]);
 
   const handleLogout = async () => {
     if (user) {

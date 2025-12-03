@@ -31,7 +31,9 @@ export function useCategoryThreadsSync(categoryId) {
 
         return () => {
             window.removeEventListener('forumThreadsUpdated', handleUpdate);
-            forumRealtimeSync.stopCategorySync(categoryId);
+            if (forumRealtimeSync && typeof forumRealtimeSync.stopCategorySync === 'function') {
+                forumRealtimeSync.stopCategorySync(categoryId);
+            }
         };
     }, [categoryId, queryClient]);
 
@@ -63,7 +65,9 @@ export function useThreadSync(threadId) {
 
         return () => {
             window.removeEventListener('forumThreadUpdated', handleUpdate);
-            forumRealtimeSync.stopThreadSync(threadId);
+            if (forumRealtimeSync && typeof forumRealtimeSync.stopThreadSync === 'function') {
+                forumRealtimeSync.stopThreadSync(threadId);
+            }
         };
     }, [threadId, queryClient]);
 
@@ -95,7 +99,9 @@ export function useThreadRepliesSync(threadId) {
 
         return () => {
             window.removeEventListener('forumRepliesUpdated', handleUpdate);
-            forumRealtimeSync.stopThreadSync(threadId);
+            if (forumRealtimeSync && typeof forumRealtimeSync.stopRepliesSync === 'function') {
+                forumRealtimeSync.stopRepliesSync(threadId);
+            }
         };
     }, [threadId, queryClient]);
 
@@ -123,7 +129,9 @@ export function useTrendingThreadsSync() {
 
         return () => {
             window.removeEventListener('trendingThreadsUpdated', handleUpdate);
-            if (this.syncIntervals['trending']) clearInterval(this.syncIntervals['trending']);
+            if (forumRealtimeSync && typeof forumRealtimeSync.stopTrendingSync === 'function') {
+                forumRealtimeSync.stopTrendingSync();
+            }
         };
     }, [queryClient]);
 
@@ -151,6 +159,9 @@ export function useHotThreadsSync() {
 
         return () => {
             window.removeEventListener('hotThreadsUpdated', handleUpdate);
+            if (forumRealtimeSync && typeof forumRealtimeSync.stopHotThreadsSync === 'function') {
+                forumRealtimeSync.stopHotThreadsSync();
+            }
         };
     }, [queryClient]);
 
@@ -189,4 +200,49 @@ export function useForumSyncManager() {
     }, []);
 
     return { pause, resume, stop, getStatus };
+}
+
+/**
+ * ✅ Hook untuk sync user profile changes (admin role, membership, etc.)
+ */
+export function useUserProfileSync(userEmail) {
+    const [profile, setProfile] = useState(null);
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (!userEmail) return;
+
+        // Start sync
+        forumRealtimeSync.startUserProfileSync(userEmail, 10000);
+
+        // Listen to updates
+        const handleUpdate = (event) => {
+            if (event.detail.userEmail === userEmail) {
+                setProfile(event.detail.profile);
+                // Invalidate related queries to trigger re-renders
+                queryClient.invalidateQueries(['userProfile', userEmail]);
+                queryClient.invalidateQueries(['currentUser']);
+                
+                // Also dispatch a custom event for admin features that need to know about role changes
+                window.dispatchEvent(new CustomEvent('adminRoleUpdated', { 
+                    detail: { 
+                        userEmail, 
+                        membership_tier: event.detail.membership_tier,
+                        is_banned: event.detail.is_banned
+                    } 
+                }));
+            }
+        };
+
+        window.addEventListener('userProfileUpdated', handleUpdate);
+
+        return () => {
+            window.removeEventListener('userProfileUpdated', handleUpdate);
+            if (forumRealtimeSync && typeof forumRealtimeSync.stopUserProfileSync === 'function') {
+                forumRealtimeSync.stopUserProfileSync(userEmail);
+            }
+        };
+    }, [userEmail, queryClient]);
+
+    return profile;
 }
