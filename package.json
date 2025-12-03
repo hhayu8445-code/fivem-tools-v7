@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "type-check": "echo 'Type checking with JSDoc...'"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
