@@ -13,36 +13,6 @@ if (!API_KEY || !APP_ID) {
   );
 }
 
-// ✅ PKCE Helper: Convert Uint8Array to base64url string
-const base64url = (bytes) => {
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-};
-
-// ✅ Simple SHA-256 implementation using built-in crypto API with fallback
-const sha256 = async (data) => {
-  try {
-    // Try using Web Crypto API (available in all modern browsers)
-    const encoder = new TextEncoder();
-    const encodedData = encoder.encode(data);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedData);
-    return hashBuffer;
-  } catch (err) {
-    console.warn('crypto.subtle.digest failed, using simple hash:', err);
-    // Fallback: use simple string hash if crypto.subtle fails
-    // This is NOT cryptographically secure but prevents complete failure
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return new Uint8Array([hash & 0xFF, (hash >> 8) & 0xFF, (hash >> 16) & 0xFF, (hash >> 24) & 0xFF]);
-  }
-};
-
 const BASE_URL = `https://app.base44.com/api/apps/${APP_ID}/entities`;
 
 // Helper to construct query string from object
@@ -157,22 +127,13 @@ export const base44 = {
         const state = Math.random().toString(36).substring(7);
         localStorage.setItem('oauth_state', state);
 
-        // ✅ Generate PKCE code verifier for secure OAuth flow
-        const codeVerifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
-        localStorage.setItem('pkce_code_verifier', codeVerifier);
-
-        // Calculate PKCE code challenge using SHA-256 with fallback
-        const hashBuffer = await sha256(codeVerifier);
-        const codeChallenge = base64url(new Uint8Array(hashBuffer));
-
+        // ✅ Simple OAuth flow - PKCE not needed since we use client_secret on backend
         const params = new URLSearchParams({
           client_id: DISCORD_CLIENT_ID,
           redirect_uri: DISCORD_REDIRECT_URI,
           response_type: 'code',
           scope: 'identify email guilds',
-          state: state,
-          code_challenge: codeChallenge,
-          code_challenge_method: 'S256'
+          state: state
         });
         window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
       } catch (err) {
@@ -186,13 +147,7 @@ export const base44 = {
     handleCallback: async (code, state) => {
       console.log('[Client OAuth] Starting callback handler...');
 
-      // ✅ Check if code was already used (stored in session)
-      const usedCodes = sessionStorage.getItem('used_oauth_codes')?.split(',') || [];
-      if (usedCodes.includes(code)) {
-        console.error('[Client OAuth] Code already used - this prevents double-use attacks');
-        throw new Error('Authorization code already used. Please login again.');
-      }
-
+      // ✅ Validate state parameter
       const savedState = localStorage.getItem('oauth_state');
       if (state !== savedState) {
         console.error('[Client OAuth] State mismatch. Expected:', savedState, 'Got:', state);
@@ -201,27 +156,18 @@ export const base44 = {
 
       console.log('[Client OAuth] State validation passed');
 
-      // Get PKCE code verifier for secure token exchange
-      const codeVerifier = localStorage.getItem('pkce_code_verifier');
-      if (!codeVerifier) {
-        console.error('[Client OAuth] Missing PKCE code verifier');
-        throw new Error('Invalid PKCE session. Please login again.');
-      }
-
-      console.log('[Client OAuth] PKCE verifier found');
-
       // ✅ SECURE: Call backend API to exchange code for token
-      // Client secret is now safely stored on backend
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || '/api';
+      // Client secret is safely stored on backend only
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || window.location.origin;
       console.log('[Client OAuth] Backend URL:', backendUrl);
 
       try {
         console.log('[Client OAuth] Sending code to backend...');
 
-        const response = await fetch(`${backendUrl}/discord-callback`, {
+        const response = await fetch(`${backendUrl}/api/discord-callback`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, codeVerifier })
+          body: JSON.stringify({ code })
         });
 
         const responseData = await response.json();
@@ -229,14 +175,6 @@ export const base44 = {
         if (!response.ok) {
           console.error('[Client OAuth] Backend returned error:', response.status, responseData);
           const errorMessage = responseData.error || `Server error (${response.status})`;
-          
-          // ✅ Mark code as used if we get invalid_grant or similar errors
-          if (errorMessage.includes('invalid_grant') || errorMessage.includes('already used')) {
-            usedCodes.push(code);
-            sessionStorage.setItem('used_oauth_codes', usedCodes.join(','));
-            console.log('[Client OAuth] Code marked as used');
-          }
-          
           throw new Error(errorMessage);
         }
 
@@ -256,17 +194,12 @@ export const base44 = {
 
         console.log('[Client OAuth] Storing credentials...');
 
-        // Store token
+        // ✅ Store token and user data
         localStorage.setItem(TOKEN_STORAGE_KEY, access_token);
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
 
-        // ✅ Mark code as used to prevent re-use attacks
-        usedCodes.push(code);
-        sessionStorage.setItem('used_oauth_codes', usedCodes.join(','));
-
         // ✅ Clean up OAuth temporary data
         localStorage.removeItem('oauth_state');
-        localStorage.removeItem('pkce_code_verifier');
 
         console.log('[Client OAuth] Creating user profile...');
 

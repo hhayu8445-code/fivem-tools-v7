@@ -4,8 +4,9 @@
     "DISCORD_CLIENT_SECRET": "HAr2l-mTe-CLNSLTaEPgJrRNe7KVG3z6",
     "DISCORD_REDIRECT_URI": "https://fivemtools.net/auth/callback",
     "VITE_DISCORD_CLIENT_ID": "1445650115447754933",
-    "VITE_DISCORD_CLIENT_SECRET": "HAr2l-mTe-CLNSLTaEPgJrRNe7KVG3z6",
-    "VITE_DISCORD_REDIRECT_URI": "https://fivemtools.net/auth/callback"
+    "VITE_DISCORD_REDIRECT_URI": "https://fivemtools.net/auth/callback",
+    "NODE_ENV": "production",
+    "FRONTEND_URL": "https://fivemtools.net"
   },
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
