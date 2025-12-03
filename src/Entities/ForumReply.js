@@ -28,6 +28,31 @@
     "reports_count": {
       "type": "number",
       "default": 0
+    },
+    "created_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_by": {
+      "type": "string"
+    },
+    "is_deleted": {
+      "type": "boolean",
+      "default": false
+    },
+    "deleted_reason": {
+      "type": "string"
+    },
+    "deleted_by": {
+      "type": "string"
+    },
+    "deleted_date": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [

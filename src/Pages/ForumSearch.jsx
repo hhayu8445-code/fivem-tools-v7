@@ -8,6 +8,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { forumManagement } from '@/utils/forumManagement';
 
 export default function ForumSearch() {
   const [query, setQuery] = useState('');
@@ -26,34 +27,24 @@ export default function ForumSearch() {
       e.preventDefault();
       setIsSearching(true);
 
-      // Client-side filtering simulation since entity list query is basic
-      // In a real backend we'd construct a complex query
-      let filter = {};
-      if (category !== 'all') filter.category_id = category;
+      // Use centralized forum management for advanced search
+      const filters = {
+        category_id: category !== 'all' ? category : undefined,
+        sort_by: 'relevance',
+        limit: 100
+      };
 
-      // Fetch broader set and filter locally for this demo
-      const threads = await base44.entities.ForumThread.list({ 
-          query: filter, 
-          limit: 100,
-          sort: { created_date: -1 }
-      });
+      // Handle date range filter
+      if (dateRange !== 'all') {
+        filters.date_range = dateRange;
+      }
 
-      let filtered = threads.filter(t => {
-          const matchQuery = !query || t.title.toLowerCase().includes(query.toLowerCase()) || t.content.toLowerCase().includes(query.toLowerCase());
-          const matchAuthor = !author || t.author_name.toLowerCase().includes(author.toLowerCase());
-          
-          let matchDate = true;
-          if (dateRange !== 'all') {
-              const date = new Date(t.created_date);
-              const now = new Date();
-              if (dateRange === 'today') matchDate = date > new Date(now.setDate(now.getDate() - 1));
-              else if (dateRange === 'week') matchDate = date > new Date(now.setDate(now.getDate() - 7));
-              else if (dateRange === 'month') matchDate = date > new Date(now.setMonth(now.getMonth() - 1));
-          }
+      // Add author filter if provided
+      if (author) {
+        filters.author_search = author;
+      }
 
-          return matchQuery && matchAuthor && matchDate;
-      });
-
+      const filtered = await forumManagement.searchThreads(query || '', filters);
       setResults(filtered);
       setIsSearching(false);
   };

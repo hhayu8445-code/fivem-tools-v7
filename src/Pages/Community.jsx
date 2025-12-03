@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Skeleton } from '@/Components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { getIconUrl } from '@/utils';
+import { forumManagement } from '@/utils/forumManagement';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 
 export default function Community() {
@@ -31,8 +32,8 @@ export default function Community() {
     });
 
     const { data: recentThreads, isLoading: threadsLoading } = useQuery({
-        queryKey: ['recentThreads'],
-        queryFn: () => base44.entities.ForumThread.list({ sort: { created_date: -1 }, limit: 5 }),
+        queryKey: ['trendingThreads'],
+        queryFn: () => forumManagement.getTrendingThreads(7, 5),
     });
 
     // Fetch Online Users (Active in last 15 mins)
