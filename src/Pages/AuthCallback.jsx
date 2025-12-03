@@ -37,21 +37,37 @@ export default function AuthCallback() {
         // ✅ Provide specific error messages for different failure scenarios
         let errorMessage = 'Authentication failed. Please try again.';
         
-        if (err.message.includes('Invalid state')) {
+        // Parse error messages to provide specific guidance
+        const errorMsg = err.message || '';
+        
+        if (errorMsg.includes('Invalid state')) {
           errorMessage = 'Session expired. Please login again.';
-        } else if (err.message.includes('Invalid PKCE')) {
+        } else if (errorMsg.includes('Invalid PKCE')) {
           errorMessage = 'Security error. Please login again.';
-        } else if (err.message.includes('Security error')) {
-          errorMessage = 'Security error. Please login again and allow all permissions.';
-        } else if (err.message.includes('Discord')) {
-          errorMessage = 'Discord authentication failed. Check your Discord account and try again.';
-        } else if (err.message.includes('Invalid credentials') || err.message.includes('client_secret')) {
-          errorMessage = 'Invalid Discord credentials. Please contact support.';
-        } else if (err.message.includes('No access token')) {
+        } else if (errorMsg.includes('invalid_grant')) {
+          errorMessage = 'Authorization code expired or invalid. Please login again.';
+        } else if (errorMsg.includes('invalid_request')) {
+          errorMessage = 'Invalid authentication request. Verify your Discord app settings.';
+        } else if (errorMsg.includes('unauthorized_client')) {
+          errorMessage = 'Discord app is not authorized. Check your Discord OAuth2 settings.';
+        } else if (errorMsg.includes('Server configuration error')) {
+          errorMessage = 'Server is misconfigured. ' + errorMsg;
+        } else if (errorMsg.includes('No access token')) {
           errorMessage = 'Could not get Discord access token. Please try again.';
+        } else if (errorMsg.includes('Failed to fetch user data')) {
+          errorMessage = 'Could not retrieve your Discord profile. Please try again.';
+        } else if (errorMsg.includes('Internal server error')) {
+          errorMessage = 'Server error during authentication. Please try again.';
+        } else if (errorMsg.includes('Discord')) {
+          errorMessage = 'Discord authentication failed. Check your Discord account and try again.';
+        } else if (errorMsg.includes('Invalid credentials') || errorMsg.includes('client_secret')) {
+          errorMessage = 'Invalid Discord credentials. Please contact support.';
+        } else if (errorMsg.includes('connection') || errorMsg.includes('network')) {
+          errorMessage = 'Network error. Please check your internet connection and try again.';
         }
         
         setError(errorMessage);
+        console.error('Final error message for user:', errorMessage);
         
         // Redirect after 4 seconds
         setTimeout(() => navigate('/'), 4000);

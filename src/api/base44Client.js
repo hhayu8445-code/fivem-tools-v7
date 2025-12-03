@@ -184,56 +184,95 @@ export const base44 = {
       base44.auth.login();
     },
     handleCallback: async (code, state) => {
+      console.log('[Client OAuth] Starting callback handler...');
+      
       const savedState = localStorage.getItem('oauth_state');
-      if (state !== savedState) throw new Error('Invalid state');
+      if (state !== savedState) {
+        console.error('[Client OAuth] State mismatch. Expected:', savedState, 'Got:', state);
+        throw new Error('Invalid state: Session expired or tampered');
+      }
+      
+      console.log('[Client OAuth] State validation passed');
       
       // Get PKCE code verifier for secure token exchange
       const codeVerifier = localStorage.getItem('pkce_code_verifier');
       if (!codeVerifier) {
+        console.error('[Client OAuth] Missing PKCE code verifier');
         throw new Error('Invalid PKCE session. Please login again.');
       }
+      
+      console.log('[Client OAuth] PKCE verifier found');
       
       // ✅ SECURE: Call backend API to exchange code for token
       // Client secret is now safely stored on backend
       const backendUrl = import.meta.env.VITE_BACKEND_URL || '/api';
+      console.log('[Client OAuth] Backend URL:', backendUrl);
       
       try {
+        console.log('[Client OAuth] Sending code to backend...');
+        
         const response = await fetch(`${backendUrl}/discord-callback`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code, codeVerifier })
         });
         
+        const responseData = await response.json();
+        
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || 'Authentication failed');
+          console.error('[Client OAuth] Backend returned error:', response.status, responseData);
+          const errorMessage = responseData.error || `Server error (${response.status})`;
+          throw new Error(errorMessage);
         }
         
-        const { user, access_token } = await response.json();
+        console.log('[Client OAuth] Backend response successful');
         
-        if (!user || !access_token) {
-          throw new Error('Invalid response from authentication server');
+        const { user, access_token } = responseData;
+        
+        if (!user) {
+          console.error('[Client OAuth] Missing user in response:', responseData);
+          throw new Error('Invalid response: Missing user data');
         }
+        
+        if (!access_token) {
+          console.error('[Client OAuth] Missing access_token in response:', responseData);
+          throw new Error('Invalid response: No access token');
+        }
+        
+        console.log('[Client OAuth] Storing credentials...');
         
         // Store token
         localStorage.setItem(TOKEN_STORAGE_KEY, access_token);
-        
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      
         
         // ✅ Clean up OAuth temporary data
         localStorage.removeItem('oauth_state');
         localStorage.removeItem('pkce_code_verifier');
         
-        await base44.auth.ensureProfile(user);
+        console.log('[Client OAuth] Creating user profile...');
+        
+        try {
+          await base44.auth.ensureProfile(user);
+        } catch (profileErr) {
+          console.warn('[Client OAuth] Profile creation warning:', profileErr);
+          // Don't fail authentication if profile creation fails
+        }
         
         // Trigger custom event to notify Layout about auth change
         window.dispatchEvent(new Event('auth-changed'));
         
+        console.log('[Client OAuth] Authentication successful for user:', user.id);
         return user;
       } catch (err) {
-        console.error('Backend OAuth error:', err);
-        throw new Error('Failed to authenticate with Discord. Please try again.');
+        console.error('[Client OAuth] OAuth error:', err);
+        console.error('[Client OAuth] Error stack:', err.stack);
+        
+        // Re-throw with context
+        if (err.message.includes('Failed to fetch')) {
+          throw new Error('Network error: Could not reach authentication server. Check your internet connection.');
+        }
+        
+        throw new Error(err.message || 'Failed to authenticate with Discord. Please try again.');
       }
     },
     ensureProfile: async (user) => {
