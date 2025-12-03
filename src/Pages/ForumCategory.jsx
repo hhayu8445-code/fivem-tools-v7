@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -6,12 +6,25 @@ import { Button } from '@/Components/ui/button';
 import { Skeleton } from '@/Components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import LoadingSpinner from '@/Components/LoadingSpinner';
+import { useCategoryThreadsSync, useForumSyncManager } from '@/hooks/useForumSync';
 
 export default function ForumCategory() {
   const { id: catId } = useParams();
   const navigate = useNavigate();
   const [page, setPage] = React.useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const PAGE_SIZE = 10;
+
+  // ✅ REALTIME SYNC: Event-driven category threads
+  const threads = useCategoryThreadsSync(catId);
+  const { pause: pauseSync, resume: resumeSync } = useForumSyncManager();
+
+  // ✅ Auto-update loading state
+  useEffect(() => {
+    if (threads && threads.length >= 0) {
+      setIsLoading(false);
+    }
+  }, [threads]);
 
   const { data: category } = useQuery({
     queryKey: ['category', catId],
@@ -22,16 +35,11 @@ export default function ForumCategory() {
     enabled: !!catId
   });
 
-  const { data: threads, isLoading } = useQuery({
-    queryKey: ['catThreads', catId, page],
-    queryFn: () => base44.entities.ForumThread.list({ 
-        query: { category_id: catId },
-        sort: { is_pinned: -1, last_reply_date: -1 },
-        limit: PAGE_SIZE,
-        skip: (page - 1) * PAGE_SIZE
-    }),
-    enabled: !!catId
-  });
+  // ✅ Paginate threads locally
+  const paginatedThreads = React.useMemo(() => {
+    if (!threads || threads.length === 0) return [];
+    return threads.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  }, [threads, page]);
 
   if (!category) return <LoadingSpinner fullScreen />;
 
@@ -55,9 +63,9 @@ export default function ForumCategory() {
                 <div className="flex justify-center py-10">
                     <LoadingSpinner size="lg" />
                 </div>
-            ) : threads?.length > 0 ? (
+            ) : paginatedThreads?.length > 0 ? (
                 <div className="divide-y divide-zinc-800">
-                    {threads.map(thread => (
+                    {paginatedThreads.map(thread => (
                         <div key={thread.id} className={`p-4 transition-all flex items-center gap-4 group border-l-4 ${thread.is_pinned ? 'bg-fuchsia-950/10 border-l-fuchsia-500 hover:bg-fuchsia-900/20' : 'bg-transparent border-l-transparent hover:bg-zinc-900 hover:border-l-zinc-700'}`}>
                             <div className="flex-shrink-0">
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-all ${thread.is_pinned ? 'bg-fuchsia-500/10 border-fuchsia-500/50 shadow-[0_0_10px_rgba(217,70,239,0.2)]' : 'bg-zinc-800 border-zinc-700'}`}>
@@ -117,7 +125,7 @@ export default function ForumCategory() {
             </Button>
             <Button 
                 variant="outline" 
-                disabled={threads?.length < PAGE_SIZE} 
+                disabled={!threads || page * PAGE_SIZE >= threads.length} 
                 onClick={() => setPage(p => p + 1)}
                 className="bg-zinc-900 border-zinc-800 text-zinc-300"
             >

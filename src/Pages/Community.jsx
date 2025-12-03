@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Skeleton } from '@/Components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { getIconUrl } from '@/utils';
-import { forumManagement } from '@/utils/forumManagement';
+import { useTrendingThreadsSync, useHotThreadsSync, useForumSyncManager } from '@/hooks/useForumSync';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 
 export default function Community() {
@@ -19,37 +19,57 @@ export default function Community() {
         'https://cdn.discordapp.com/attachments/1252388644480618527/1433174567916142592/Banner.png?ex=692f3cd4&is=692deb54&hm=832dfdb162d145d63a22c7dc057b941e5aa7204f46a9b38f15d6a7cddb219fed'
     ];
 
+    const [threadsLoading, setThreadsLoading] = useState(true);
+    const [hotLoading, setHotLoading] = useState(true);
+
     React.useEffect(() => {
         const interval = setInterval(() => {
             setCurrentAd((prev) => (prev + 1) % adBanners.length);
         }, 5000);
         return () => clearInterval(interval);
     }, []);
+
+    // ✅ REALTIME SYNC: Event-driven trending threads (updated every 15 seconds)
+    const recentThreads = useTrendingThreadsSync();
+    const { pause: pauseSync, resume: resumeSync } = useForumSyncManager();
+
+    // ✅ Auto-update loading state for trending
+    useEffect(() => {
+      if (recentThreads && recentThreads.length >= 0) {
+        setThreadsLoading(false);
+      }
+    }, [recentThreads]);
+
+    // ✅ REALTIME SYNC: Event-driven hot threads (updated every 8 seconds)
+    const hotThreads = useHotThreadsSync();
+
+    // ✅ Auto-update loading state for hot
+    useEffect(() => {
+      if (hotThreads && hotThreads.length >= 0) {
+        setHotLoading(false);
+      }
+    }, [hotThreads]);
+
     const { data: categories, isLoading: catsLoading } = useQuery({
         queryKey: ['forumCategories'],
         queryFn: () => base44.entities.ForumCategory.list({ sort: { order: 1 } }),
-        staleTime: 60000
+        staleTime: 60000,
+        refetchInterval: 30000
     });
 
-    const { data: recentThreads, isLoading: threadsLoading } = useQuery({
-        queryKey: ['trendingThreads'],
-        queryFn: () => forumManagement.getTrendingThreads(7, 5),
-    });
-
-    // Fetch Online Users (Active in last 15 mins)
+    // ✅ REALTIME: Online users updated every 15 seconds
     const { data: onlineUsers } = useQuery({
         queryKey: ['onlineUsers'],
         queryFn: async () => {
-            // In a real app we would filter by date range on backend
-            // Here we fetch recent active users and filter
             const users = await base44.entities.UserProfile.list({
                 sort: { last_seen: -1 },
                 limit: 20
             });
             const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
-            return users.filter(u => new Date(u.last_seen) > fifteenMinsAgo);
+            return users.filter(u => u.last_seen && new Date(u.last_seen) > fifteenMinsAgo);
         },
-        refetchInterval: 30000
+        staleTime: 5000,
+        refetchInterval: 15000
     });
 
     return (

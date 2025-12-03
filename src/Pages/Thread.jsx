@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,11 @@ import { logToDiscord } from '@/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/Components/ui/dialog';
 import { Label } from '@/Components/ui/label';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  useThreadSync,
+  useThreadRepliesSync,
+  useForumSyncManager
+} from '@/hooks/useForumSync';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,9 +38,27 @@ export default function Thread() {
     const [userProfile, setUserProfile] = useState(null);
     const [replyPage, setReplyPage] = useState(1);
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [threadLoading, setThreadLoading] = useState(true);
+    const [repliesLoading, setRepliesLoading] = useState(true);
     const REPLIES_PER_PAGE = 10;
+    const queryClient = useQueryClient();
 
-    React.useEffect(() => {
+    // ✅ REALTIME SYNC: Event-driven thread updates
+    const thread = useThreadSync(threadId);
+    const replies = useThreadRepliesSync(threadId);
+    const { pause: pauseSync, resume: resumeSync } = useForumSyncManager();
+
+    // ✅ Auto-update loading states when data arrives
+    useEffect(() => {
+      if (thread) setThreadLoading(false);
+    }, [thread]);
+
+    useEffect(() => {
+      if (replies && replies.length >= 0) setRepliesLoading(false);
+    }, [replies]);
+
+    // ✅ Fetch user profile
+    useEffect(() => {
         base44.auth.me().then(async (u) => {
             setUser(u);
             if (u) {
@@ -46,7 +69,6 @@ export default function Thread() {
     }, []);
 
     const isAdminOrMod = userProfile?.membership_tier === 'admin' || userProfile?.membership_tier === 'moderator';
-    const queryClient = useQueryClient();
 
     // Helper for badges
     const UserBadge = ({ email }) => {
@@ -99,15 +121,6 @@ export default function Thread() {
         );
     };
 
-    const { data: thread, isLoading: threadLoading } = useQuery({
-        queryKey: ['thread', threadId],
-        queryFn: async () => {
-            const threads = await base44.entities.ForumThread.list({ query: { id: threadId } });
-            return threads[0];
-        },
-        enabled: !!threadId
-    });
-
     // Helper to safely render HTML content
     const RichTextDisplay = ({ content }) => {
         // Simple check if it looks like HTML (starts with <) otherwise treat as markdown
@@ -122,17 +135,6 @@ export default function Thread() {
         );
     };
 
-    const { data: replies, isLoading: repliesLoading, refetch: refetchReplies } = useQuery({
-        queryKey: ['replies', threadId, replyPage],
-        queryFn: () => base44.entities.ForumReply.list({
-            query: { thread_id: threadId },
-            sort: { created_date: 1 },
-            limit: REPLIES_PER_PAGE,
-            skip: (replyPage - 1) * REPLIES_PER_PAGE
-        }),
-        enabled: !!threadId
-    });
-
     const replyMutation = useMutation({
         mutationFn: async () => {
             if (!user) throw new Error("Not logged in");
@@ -146,16 +148,16 @@ export default function Thread() {
 
             // Update thread reply count and last reply date
             await base44.entities.ForumThread.update(threadId, {
-                replies_count: (thread.replies_count || 0) + 1,
+                replies_count: (thread?.replies_count || 0) + 1,
                 last_reply_date: new Date().toISOString()
             });
 
             // Send Notification
-            if (thread.author_email !== user.email) {
+            if (thread?.author_email !== user.email) {
                 await base44.entities.Notification.create({
                     user_email: thread.author_email,
                     type: 'reply',
-                    message: `${user.full_name || 'Someone'} replied to your thread "${thread.title}"`,
+                    message: `${user.full_name || 'Someone'} replied to your thread "${thread?.title}"`,
                     link: `/community/thread/${threadId}`,
                     is_read: false
                 });
@@ -163,13 +165,13 @@ export default function Thread() {
         },
         onSuccess: () => {
             setReplyContent('');
-            refetchReplies();
+            // ✅ Realtime sync will auto-update the replies list via event
             toast.success('Reply posted successfully!');
             logToDiscord('New Reply Posted', {
                 type: 'reply',
                 user: user.full_name || user.username,
                 email: user.email,
-                description: `💬 Reply posted on thread: ${thread.title}`,
+                description: `💬 Reply posted on thread: ${thread?.title}`,
                 extra: { 'Thread ID': threadId }
             });
         },
